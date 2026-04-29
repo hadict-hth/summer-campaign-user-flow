@@ -205,7 +205,7 @@ body{
 <div id="cv">
 
 <!-- ════════════════════════════════════════
-     SVG ARROWS (UPDATED Y-COORDINATES)
+     SVG ARROWS (UPDATED Y-COORDINATES & SHIFTED X +40px)
 ════════════════════════════════════════ -->
 <svg id="arrs" xmlns="http://www.w3.org/2000/svg">
 <defs>
@@ -242,69 +242,66 @@ body{
 <line x1="1130" y1="480" x2="1180" y2="480" stroke="#8b5cf6" stroke-width="2" marker-end="url(#mp)"/>
 <text x="1155" y="472" class="arr-txt" fill="#6d28d9" text-anchor="middle">✓ Verified</text>
 
-<!-- Phone 5 (Minigame) → Randomizer Backend -->
+<!-- Phone 5 (Minigame) → Rule Backend -->
 <line x1="1316" y1="480" x2="1380" y2="480" stroke="#10b981" stroke-width="2" marker-end="url(#mg)"/>
 <text x="1348" y="472" class="arr-txt" fill="#047857" text-anchor="middle"> 1 lượt✓ → +1pt</text>
 
-<!-- Share loop on game phone -->
-<path d="M 1248 398 C 1288 370, 1326 380, 1286 415" stroke="#10b981" stroke-width="1.4" fill="none" marker-end="url(#mg)" stroke-dasharray="3,2" opacity=".75"/>
-<text x="1323" y="368" font-size="7.5" fill="#047857" font-weight="700" font-family="Inter,sans-serif">Share +1 lượt 🔗</text>
+<!-- Mũi tên và Rule đè lên UI đã được kéo dài ra và shift +40px -->
+<!-- Rule → 3 RULE CARDS (WIDER SPACING Y: 160, 480, 800) -->
+<path d="M 1460 480 C 1490 160, 1530 160, 1580 160" stroke="#0ea5e9" stroke-width="2.5" fill="none" marker-end="url(#ms)" opacity=".85"/>
+<line x1="1460" y1="480" x2="1580" y2="480" stroke="#16a34a" stroke-width="2.5" marker-end="url(#msk)" opacity=".85"/>
+<path d="M 1460 480 C 1490 800, 1530 800, 1580 800" stroke="#db2777" stroke-width="2.5" fill="none" marker-end="url(#mpk)" opacity=".85"/>
 
-<!-- Randomizer → 3 RULE CARDS (WIDER SPACING Y: 160, 480, 800) -->
-<path d="M 1460 480 C 1490 160, 1510 160, 1540 160" stroke="#0ea5e9" stroke-width="2.5" fill="none" marker-end="url(#ms)" opacity=".85"/>
-<line x1="1460" y1="480" x2="1540" y2="480" stroke="#16a34a" stroke-width="2.5" marker-end="url(#msk)" opacity=".85"/>
-<path d="M 1460 480 C 1490 800, 1510 800, 1540 800" stroke="#db2777" stroke-width="2.5" fill="none" marker-end="url(#mpk)" opacity=".85"/>
-
-<!-- Rule labels on arrows from Randomizer to Cards -->
-<text x="1500" y="300" class="arr-txt" fill="#0369a1" text-anchor="middle">RULE 1: ≥4 pts</text>
-<text x="1500" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">RULE 2: ≥4 pts + KHM</text>
-<text x="1500" y="660" class="arr-txt" fill="#be185d" text-anchor="middle">RULE 3: &gt;6 pts ⭐</text>
+<!-- Rule labels on arrows from MATRIX to Cards -->
+<text x="1520" y="300" class="arr-txt" fill="#0369a1" text-anchor="middle">RULE 1: ≥4 pts</text>
+<text x="1520" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">RULE 2: ≥4 pts + KHM</text>
+<text x="1520" y="660" class="arr-txt" fill="#be185d" text-anchor="middle">RULE 3: &gt;6 pts ⭐</text>
 
 <!-- Rule Cards → Visual Phones -->
-<line x1="1820" y1="160" x2="1900" y2="160" stroke="#0ea5e9" stroke-width="1.8" marker-end="url(#ms)" opacity=".8"/>
-<text x="1860" y="152" class="arr-txt" fill="#0369a1" text-anchor="middle">Hiển thị</text>
-<line x1="1820" y1="480" x2="1900" y2="480" stroke="#16a34a" stroke-width="1.8" marker-end="url(#msk)" opacity=".8"/>
-<text x="1860" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">Hiển thị</text>
-<line x1="1820" y1="800" x2="1900" y2="800" stroke="#db2777" stroke-width="1.8" marker-end="url(#mpk)" opacity=".8"/>
-<text x="1860" y="792" class="arr-txt" fill="#be185d" text-anchor="middle">Hiển thị</text>
+<line x1="1860" y1="160" x2="1940" y2="160" stroke="#0ea5e9" stroke-width="1.8" marker-end="url(#ms)" opacity=".8"/>
+<text x="1900" y="152" class="arr-txt" fill="#0369a1" text-anchor="middle">Hiển thị</text>
+<line x1="1860" y1="480" x2="1940" y2="480" stroke="#16a34a" stroke-width="1.8" marker-end="url(#msk)" opacity=".8"/>
+<text x="1900" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">Hiển thị</text>
+<line x1="1860" y1="800" x2="1940" y2="800" stroke="#db2777" stroke-width="1.8" marker-end="url(#mpk)" opacity=".8"/>
+<text x="1900" y="792" class="arr-txt" fill="#be185d" text-anchor="middle">Hiển thị</text>
 
 <!-- Visual Phones → Ecode merge -->
-<path d="M 2036 160 C 2090 160, 2110 480, 2180 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
-<line x1="2036" y1="480" x2="2180" y2="480" stroke="#059669" stroke-width="1.8" marker-end="url(#me)" opacity=".7"/>
-<path d="M 2036 800 C 2090 800, 2110 480, 2180 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
+<path d="M 2076 160 C 2130 160, 2150 480, 2220 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
+<line x1="2076" y1="480" x2="2220" y2="480" stroke="#059669" stroke-width="1.8" marker-end="url(#me)" opacity=".7"/>
+<path d="M 2076 800 C 2130 800, 2150 480, 2220 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
 
 <!-- Ecode → Decision -->
-<line x1="2316" y1="480" x2="2400" y2="480" stroke="#f59e0b" stroke-width="2" marker-end="url(#ma)"/>
+<line x1="2356" y1="480" x2="2460" y2="480" stroke="#f59e0b" stroke-width="2" marker-end="url(#ma)"/>
 
 <!-- Decision → Converted (top) -->
-<path d="M 2480 440 C 2480 330, 2550 330, 2600 330" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#ml)"/>
-<text x="2540" y="322" class="arr-txt" fill="#15803d" font-weight="800" text-anchor="middle">✓ ĐÃ MUA</text>
+<path d="M 2530 440 C 2530 330, 2590 330, 2640 330" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#ml)"/>
+<text x="2580" y="322" class="arr-txt" fill="#15803d" font-weight="800" text-anchor="middle">✓ ĐÃ MUA</text>
 
 <!-- Converted → End -->
-<line x1="2736" y1="330" x2="2840" y2="330" stroke="#22c55e" stroke-width="1.8" marker-end="url(#ml)" stroke-dasharray="4,3"/>
+<line x1="2776" y1="330" x2="2880" y2="330" stroke="#22c55e" stroke-width="1.8" marker-end="url(#ml)" stroke-dasharray="4,3"/>
 
 <!-- Decision → Drop-off (bottom) -->
-<path d="M 2480 520 C 2480 630, 2550 630, 2600 630" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#mr)"/>
-<text x="2540" y="646" class="arr-txt" fill="#b91c1c" font-weight="800" text-anchor="middle">✗ CHƯA MUA</text>
+<path d="M 2530 520 C 2530 630, 2590 630, 2640 630" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#mr)"/>
+<text x="2580" y="646" class="arr-txt" fill="#b91c1c" font-weight="800" text-anchor="middle">✗ CHƯA MUA</text>
 
 <!-- Nurturing chain -->
-<line x1="2736" y1="630" x2="2840" y2="630" stroke="#ef4444" stroke-width="2" marker-end="url(#mr)"/>
-<text x="2788" y="620" class="arr-txt" fill="#b91c1c" text-anchor="middle">Stage 1</text>
+<line x1="2776" y1="630" x2="2880" y2="630" stroke="#ef4444" stroke-width="2" marker-end="url(#mr)"/>
+<text x="2828" y="620" class="arr-txt" fill="#b91c1c" text-anchor="middle">Stage 1</text>
 
-<line x1="2976" y1="630" x2="3080" y2="630" stroke="#be185d" stroke-width="2" marker-end="url(#mpk)"/>
-<text x="3028" y="620" class="arr-txt" fill="#9d174d" text-anchor="middle">Stage 2</text>
+<line x1="3016" y1="630" x2="3120" y2="630" stroke="#be185d" stroke-width="2" marker-end="url(#mpk)"/>
+<text x="3068" y="620" class="arr-txt" fill="#9d174d" text-anchor="middle">Stage 2</text>
 
-<line x1="3216" y1="630" x2="3320" y2="630" stroke="#e11d48" stroke-width="2" marker-end="url(#mr)"/>
-<text x="3268" y="620" class="arr-txt" fill="#be123c" text-anchor="middle">Stage 3</text>
+<line x1="3256" y1="630" x2="3360" y2="630" stroke="#e11d48" stroke-width="2" marker-end="url(#mr)"/>
+<text x="3308" y="620" class="arr-txt" fill="#be123c" text-anchor="middle">Stage 3</text>
 
-<line x1="3456" y1="630" x2="3560" y2="630" stroke="#64748b" stroke-width="1.8" marker-end="url(#mk)" stroke-dasharray="4,3"/>
-<text x="3508" y="620" class="arr-txt" fill="#475569" text-anchor="middle">Data CN</text>
+<line x1="3496" y1="630" x2="3600" y2="630" stroke="#64748b" stroke-width="1.8" marker-end="url(#mk)" stroke-dasharray="4,3"/>
+<text x="3548" y="620" class="arr-txt" fill="#475569" text-anchor="middle">Data CN</text>
 
 </svg>
 
 
 <!-- ════════════════════════════════════════
-     PHASE ZONES (SHIFTED Y)
+     PHASE ZONES (SHIFTED Y & EXPANDED X)
 ════════════════════════════════════════ -->
 <!-- Entry -->
 <div class="zone" style="left:40px;top:145px;width:890px;height:590px;border-color:#c7d2fe;background:rgba(238,242,255,.35);">
@@ -315,15 +312,15 @@ body{
   <div class="zone-lbl" style="background:#d1fae5;color:#065f46;">🎮 Bước 1.2 — Gamification</div>
 </div>
 <!-- Gacha & Reward Matrix -->
-<div class="zone" style="left:1350px;top:10px;width:710px;height:980px;border-color:#ddd6fe;background:rgba(237,233,254,.25);">
-  <div class="zone-lbl" style="background:#ede9fe;color:#4c1d95;">🎲 Hệ Thống Randomizer & Ma Trận Trả Thưởng</div>
+<div class="zone" style="left:1350px;top:10px;width:750px;height:980px;border-color:#ddd6fe;background:rgba(237,233,254,.25);">
+  <div class="zone-lbl" style="background:#ede9fe;color:#4c1d95;">🎲 Hệ Thống Trả Thưởng</div>
 </div>
 <!-- Post-reward -->
-<div class="zone" style="left:2370px;top:150px;width:400px;height:595px;border-color:#fde68a;background:rgba(254,252,232,.35);">
+<div class="zone" style="left:2380px;top:150px;width:430px;height:595px;border-color:#fde68a;background:rgba(254,252,232,.35);">
   <div class="zone-lbl" style="background:#fef9c3;color:#713f12;">⚖️ Phân Nhánh Hành Vi</div>
 </div>
 <!-- Nurturing -->
-<div class="zone" style="left:2600px;top:480px;width:1000px;height:295px;border-color:#fecaca;background:rgba(254,226,226,.22);">
+<div class="zone" style="left:2620px;top:480px;width:920px;height:295px;border-color:#fecaca;background:rgba(254,226,226,.22);">
   <div class="zone-lbl" style="background:#ffe4e6;color:#9f1239;">📧 Nurturing Flow — Nhánh B</div>
 </div>
 
@@ -510,7 +507,7 @@ body{
 
 
 <!-- ════════════════════════════════════════
-     BACKEND NODE — GACHA / RANDOMIZER
+     BACKEND NODE — GACHA / HỆ THỐNG TRẢ THƯỞNG
 ════════════════════════════════════════ -->
 <div style="position:absolute;left:1380px;top:445px;width:80px;height:80px;display:flex;align-items:center;justify-content:center;z-index:10;">
   <div style="transform:rotate(45deg);width:55px;height:55px;background:#ede9fe;border:2.5px solid #8b5cf6;border-radius:12px;box-shadow:0 6px 16px rgba(139,92,246,.18);position:absolute;"></div>
@@ -518,7 +515,7 @@ body{
      <div style="font-size:24px;line-height:1;margin-bottom:2px;">🎲</div>
   </div>
   <div style="position:absolute;top:85px;width:160px;text-align:center;">
-     <div style="font-size:9px;font-weight:800;color:#4c1d95;background:#f5f3ff;border:1.5px solid #ddd6fe;padding:4px 8px;border-radius:6px;display:inline-block;">HỆ THỐNG RANDOMIZER</div>
+     <div style="font-size:9px;font-weight:800;color:#4c1d95;background:#f5f3ff;border:1.5px solid #ddd6fe;padding:4px 8px;border-radius:6px;display:inline-block;">HỆ THỐNG QUÀ</div>
   </div>
 </div>
 
@@ -528,7 +525,7 @@ body{
 ════════════════════════════════════════ -->
 
 <!-- RULE 1 CARD -->
-<div class="scard" style="left:1540px;top:90px;width:280px;border-color:#7dd3fc;background:linear-gradient(135deg,#fff,#f0f9ff);">
+<div class="scard" style="left:1580px;top:90px;width:280px;border-color:#7dd3fc;background:linear-gradient(135deg,#fff,#f0f9ff);">
   <div class="scard-title" style="color:#0369a1;font-size:11.5px;">🖼 Rule 1 — Visual Landscape <span style="font-size:9px;font-weight:600;color:#64748b;margin-left:4px;padding:2px 5px;background:#e2e8f0;border-radius:4px;">Áp dụng KHM & KHC</span></div>
   <div style="font-size:8.5px;color:#0369a1;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt từ 4 điểm</div>
   
@@ -544,7 +541,7 @@ body{
 </div>
 
 <!-- RULE 2 CARD -->
-<div class="scard" style="left:1540px;top:410px;width:280px;border-color:#4ade80;background:linear-gradient(135deg,#fff,#f0fdf4);">
+<div class="scard" style="left:1580px;top:410px;width:280px;border-color:#4ade80;background:linear-gradient(135deg,#fff,#f0fdf4);">
   <div class="scard-title" style="color:#15803d;font-size:11.5px;">🎫 Rule 2 — Visual Voucher <span style="font-size:9px;font-weight:600;color:#78350f;margin-left:4px;padding:2px 5px;background:#fef9c3;border-radius:4px;">Chỉ KHM</span></div>
   <div style="font-size:8.5px;color:#15803d;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt từ 4 điểm • Max 1 quà/KH</div>
 
@@ -560,7 +557,7 @@ body{
 </div>
 
 <!-- RULE 3 CARD -->
-<div class="scard" style="left:1540px;top:730px;width:280px;border-color:#f9a8d4;background:linear-gradient(135deg,#fff,#fdf2f8);">
+<div class="scard" style="left:1580px;top:730px;width:280px;border-color:#f9a8d4;background:linear-gradient(135deg,#fff,#fdf2f8);">
   <div class="scard-title" style="color:#9d174d;font-size:11.5px;">💎 Rule 3 — Visual SECRET <span style="font-size:9px;font-weight:600;color:#9d174d;margin-left:4px;padding:2px 5px;background:#fce7f3;border-radius:4px;">Hiếm</span></div>
   <div style="font-size:8.5px;color:#9d174d;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt &gt;6 điểm</div>
 
@@ -584,7 +581,7 @@ body{
 ════════════════════════════════════════ -->
 
 <!-- Phone Visual 1 -->
-<div class="phone s-r1" style="left:1900px;top:24px;">
+<div class="phone s-r1" style="left:1940px;top:24px;">
   <span class="phone-notch"></span>
   <div class="pscr">
     <div class="sc">
@@ -601,7 +598,7 @@ body{
 </div>
 
 <!-- Phone Visual 2 -->
-<div class="phone s-r2" style="left:1900px;top:344px;">
+<div class="phone s-r2" style="left:1940px;top:344px;">
   <span class="phone-notch"></span>
   <div class="pscr">
     <div class="sc">
@@ -618,7 +615,7 @@ body{
 </div>
 
 <!-- Phone Visual 3 -->
-<div class="phone s-r3" style="left:1900px;top:664px;">
+<div class="phone s-r3" style="left:1940px;top:664px;">
   <span class="phone-notch"></span>
   <div class="pscr">
     <div class="sc">
@@ -638,7 +635,7 @@ body{
 <!-- ════════════════════════════════════════
      ECODE SCREEN (MERGE)
 ════════════════════════════════════════ -->
-<div class="phone s-ecode" style="left:2180px;top:344px;">
+<div class="phone s-ecode" style="left:2220px;top:344px;">
   <div class="step-num" style="background:#059669;">✉️</div>
   <span class="phone-notch"></span>
   <div class="pscr">
@@ -661,7 +658,7 @@ body{
 <!-- ════════════════════════════════════════
      DECISION DIAMOND
 ════════════════════════════════════════ -->
-<div class="diamond-wrap" style="left:2330px;top:420px;width:140px;height:120px;">
+<div class="diamond-wrap" style="left:2390px;top:420px;width:140px;height:120px;">
   <div class="diamond-inner"></div>
   <div class="diamond-txt">
     <div style="font-size:16px;line-height:1;">🛒</div>
@@ -673,7 +670,7 @@ body{
 <!-- ════════════════════════════════════════
      CONVERTED
 ════════════════════════════════════════ -->
-<div class="phone s-conv" style="left:2600px;top:194px;">
+<div class="phone s-conv" style="left:2640px;top:194px;">
   <div class="step-num" style="background:#22c55e;">✅</div>
   <span class="phone-notch"></span>
   <div class="pscr">
@@ -691,7 +688,7 @@ body{
 </div>
 
 <!-- End flow card -->
-<div style="position:absolute;left:2840px;top:275px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:10px 12px;width:118px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+<div style="position:absolute;left:2880px;top:275px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:10px 12px;width:118px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
   <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:#64748b;">🏁 End Flow</div>
   <div style="font-size:8.5px;color:#94a3b8;margin-top:3px;line-height:1.4;">Dừng kịch bản<br>chiến dịch</div>
 </div>
@@ -700,7 +697,7 @@ body{
 <!-- ════════════════════════════════════════
      DROP-OFF
 ════════════════════════════════════════ -->
-<div class="phone s-drop" style="left:2600px;top:494px;">
+<div class="phone s-drop" style="left:2640px;top:494px;">
   <div class="step-num" style="background:#ef4444;">⚠️</div>
   <span class="phone-notch"></span>
   <div class="pscr">
@@ -721,7 +718,7 @@ body{
 <!-- ════════════════════════════════════════
      NURTURING: STAGE 1 — REMIND
 ════════════════════════════════════════ -->
-<div class="phone s-nurt" style="left:2840px;top:494px;">
+<div class="phone s-nurt" style="left:2880px;top:494px;">
   <span class="phone-notch"></span>
   <div class="pscr">
     <div class="sc">
@@ -741,7 +738,7 @@ body{
 <!-- ════════════════════════════════════════
      NURTURING: STAGE 2 — NURTURING
 ════════════════════════════════════════ -->
-<div class="phone s-nurt" style="left:3080px;top:494px;">
+<div class="phone s-nurt" style="left:3120px;top:494px;">
   <span class="phone-notch"></span>
   <div class="pscr">
     <div class="sc">
@@ -765,7 +762,7 @@ body{
 <!-- ════════════════════════════════════════
      NURTURING: STAGE 3 — FINAL OFFER
 ════════════════════════════════════════ -->
-<div class="phone s-final" style="left:3320px;top:494px;">
+<div class="phone s-final" style="left:3360px;top:494px;">
   <div class="step-num" style="background:#e11d48;">🚨</div>
   <span class="phone-notch"></span>
   <div class="pscr">
@@ -790,7 +787,7 @@ body{
 <!-- ════════════════════════════════════════
      DATA HANDOVER
 ════════════════════════════════════════ -->
-<div style="position:absolute;left:3560px;top:545px;background:#fff;border:1.5px solid #94a3b8;border-radius:12px;padding:12px 14px;width:175px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+<div style="position:absolute;left:3600px;top:545px;background:#fff;border:1.5px solid #94a3b8;border-radius:12px;padding:12px 14px;width:175px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
   <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:800;color:#334155;margin-bottom:5px;">📦 Data Handover</div>
   <div style="font-size:9px;color:#475569;line-height:1.6;">
     <strong>Data HO</strong> (Hội sở)<br>↓ Chuyển về<br>
@@ -832,7 +829,7 @@ body{
 </div>
 
 <!-- Nurturing timing note -->
-<div style="position:absolute;left:2840px;top:900px;background:#fff;border:1.5px solid #fecdd3;border-radius:10px;padding:10px 12px;width:420px;font-size:9px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+<div style="position:absolute;left:2880px;top:900px;background:#fff;border:1.5px solid #fecdd3;border-radius:10px;padding:10px 12px;width:420px;font-size:9px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
   <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#be123c;margin-bottom:5px;">⏰ Nurturing Flow — Chi tiết 3 Giai Đoạn (Timing T.B.D)</div>
   <div style="display:flex;gap:8px;">
     <div style="flex:1;background:#fff1f2;border-radius:5px;padding:5px 7px;">
