@@ -3,973 +3,885 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Flow — Summer Campaign Gamification</title>
+<title>User Flow v3 — Summer Campaign Gamification</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 
-:root{
-  --bg:#f0f2f7;
-  --surface:#ffffff;
-  --border:#e2e8f0;
-  --text:#1e293b;
-  --text2:#64748b;
-  --text3:#94a3b8;
-
-  /* Stage colors */
-  --c-entry:#6366f1;
-  --c-otp:#f59e0b;
-  --c-game:#10b981;
-  --c-gacha:#8b5cf6;
-  --c-reward:#059669;
-  --c-decision:#f59e0b;
-  --c-converted:#22c55e;
-  --c-nurture:#ef4444;
-  --c-data:#64748b;
-
-  --radius:20px;
-  --phone-w:140px;
-  --phone-h:280px;
-  --phone-r:18px;
-}
-
 body{
-  font-family: Arial, Helvetica, sans-serif;
-  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  background:#f0f2f7;
   overflow:hidden;
   user-select:none;
-  width:100vw;
-  height:100vh;
 }
 
-/* ── toolbar ── */
+/* ─── TOOLBAR ─── */
 #toolbar{
   position:fixed;top:14px;left:50%;transform:translateX(-50%);
-  z-index:200;
-  background:rgba(255,255,255,0.96);
-  border:1px solid #e2e8f0;
-  border-radius:12px;
-  padding:8px 18px;
-  display:flex;align-items:center;gap:12px;
-  backdrop-filter:blur(8px);
-  box-shadow:0 4px 24px rgba(0,0,0,.10);
+  z-index:200;background:rgba(255,255,255,.97);
+  border:1px solid #e2e8f0;border-radius:12px;
+  padding:8px 18px;display:flex;align-items:center;gap:12px;
+  backdrop-filter:blur(10px);box-shadow:0 4px 24px rgba(0,0,0,.10);
   white-space:nowrap;
 }
-#toolbar h1{font-size:13px;font-weight:700;color:#6366f1;}
+#toolbar h1{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:800;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
 #toolbar .sep{width:1px;height:20px;background:#e2e8f0;}
-#toolbar button{
-  background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;
+#toolbar .badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;
+  background:#ede9fe;color:#5b21b6;letter-spacing:.04em;}
+#toolbar button{background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;
   border-radius:7px;padding:4px 11px;font-size:12px;cursor:pointer;
-  transition:.15s;
-}
-#toolbar .sep{width:1px;height:20px;background:#e2e8f0;}
-#toolbar button{
-  background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;
-  border-radius:7px;padding:4px 11px;font-size:12px;cursor:pointer;
-  font-family:'Inter',sans-serif;transition:.15s;
-}
+  font-family:'Inter',sans-serif;transition:.15s;}
 #toolbar button:hover{background:#e0e7ff;border-color:#6366f1;color:#4338ca;}
 #zlbl{font-size:12px;color:#64748b;min-width:42px;text-align:center;}
 
-/* ── hint ── */
-#hint{
-  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,0.9);border:1px solid #e2e8f0;
+/* ─── HINT ─── */
+#hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.92);border:1px solid #e2e8f0;
   border-radius:8px;padding:5px 14px;font-size:11px;color:#64748b;
   pointer-events:none;backdrop-filter:blur(6px);
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
+  box-shadow:0 2px 8px rgba(0,0,0,.06);}
 
-/* ── canvas ── */
+/* ─── CANVAS ─── */
 #vp{width:100vw;height:100vh;overflow:hidden;cursor:grab;}
 #vp.drag{cursor:grabbing;}
-#cv{position:absolute;transform-origin:0 0;width:4200px;height:2600px;}
+#cv{position:absolute;transform-origin:0 0;width:5400px;height:1150px;}
 
-/* ══════════════════════════════════════════
-   LAYOUT SECTIONS
-   ══════════════════════════════════════════ */
-.section-label{
-  position:absolute;
-  font-size:10px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 10px;border-radius:6px;
+/* ══════════════════════════════════
+   PHASE ZONES
+══════════════════════════════════ */
+.zone{position:absolute;border-radius:16px;border:1.5px dashed;}
+.zone-lbl{
+  position:absolute;font-family:'Space Grotesk',sans-serif;
+  font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 9px;border-radius:6px;top:-12px;left:16px;
 }
 
-/* ══════════════════════════════════════════
-   PHONE MOCKUP
-   ══════════════════════════════════════════ */
+/* ══════════════════════════════════
+   PHONE MOCKUP SYSTEM
+══════════════════════════════════ */
+:root{
+  --pw:136px;--ph:272px;--pr:17px;
+}
 .phone{
   position:absolute;
-  width:var(--phone-w);
-  height:var(--phone-h);
-  background:#1a1a2e;
-  border-radius:var(--phone-r);
-  border:3px solid #2d2d4e;
-  box-shadow:0 8px 32px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.1);
-  overflow:hidden;
-  display:flex;flex-direction:column;
+  width:var(--pw);height:var(--ph);
+  background:#16213e;
+  border-radius:var(--pr);
+  border:2.5px solid #252d4a;
+  box-shadow:0 8px 32px rgba(0,0,0,.16),0 2px 8px rgba(0,0,0,.1),
+             inset 0 0 0 1px rgba(255,255,255,.04);
+  overflow:hidden;display:flex;flex-direction:column;
 }
-.phone::before{/* notch */
-  content:'';
-  display:block;
-  width:40px;height:6px;
-  background:#2d2d4e;
-  border-radius:0 0 6px 6px;
-  margin:6px auto 0;
-  flex-shrink:0;
+.phone-notch{
+  display:block;width:38px;height:5px;
+  background:#252d4a;border-radius:0 0 5px 5px;
+  margin:5px auto 0;flex-shrink:0;
 }
-.phone-screen{
-  flex:1;
-  border-radius:0 0 calc(var(--phone-r) - 3px) calc(var(--phone-r) - 3px);
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  position:relative;
-}
-/* colour accent bar top of screen */
-.phone-screen::before{
-  content:'';
-  display:block;
-  height:3px;
-  width:100%;
-  flex-shrink:0;
-}
+.pscr{flex:1;border-radius:0 0 calc(var(--pr) - 2.5px) calc(var(--pr) - 2.5px);
+  overflow:hidden;display:flex;flex-direction:column;position:relative;}
+.pscr::before{content:'';display:block;height:2.5px;width:100%;flex-shrink:0;}
 
 /* ── Screen themes ── */
-.scr-entry   .phone-screen{background:linear-gradient(160deg,#ede9fe,#dbeafe);}
-.scr-entry   .phone-screen::before{background:var(--c-entry);}
-.scr-otp     .phone-screen{background:linear-gradient(160deg,#fef9c3,#fff7ed);}
-.scr-otp     .phone-screen::before{background:var(--c-otp);}
-.scr-game    .phone-screen{background:linear-gradient(160deg,#d1fae5,#ecfdf5);}
-.scr-game    .phone-screen::before{background:var(--c-game);}
-.scr-gacha   .phone-screen{background:linear-gradient(160deg,#ede9fe,#faf5ff);}
-.scr-gacha   .phone-screen::before{background:var(--c-gacha);}
-.scr-landscape .phone-screen{background:linear-gradient(160deg,#e0f2fe,#f0f9ff);}
-.scr-landscape .phone-screen::before{background:#0ea5e9;}
-.scr-voucher .phone-screen{background:linear-gradient(160deg,#dcfce7,#f0fdf4);}
-.scr-voucher .phone-screen::before{background:#16a34a;}
-.scr-secret  .phone-screen{background:linear-gradient(160deg,#fce7f3,#fdf2f8);}
-.scr-secret  .phone-screen::before{background:#db2777;}
-.scr-reward  .phone-screen{background:linear-gradient(160deg,#d1fae5,#ecfdf5);}
-.scr-reward  .phone-screen::before{background:var(--c-reward);}
-.scr-conv    .phone-screen{background:linear-gradient(160deg,#dcfce7,#f0fdf4);}
-.scr-conv    .phone-screen::before{background:var(--c-converted);}
-.scr-dropoff .phone-screen{background:linear-gradient(160deg,#fee2e2,#fff1f2);}
-.scr-dropoff .phone-screen::before{background:var(--c-nurture);}
-.scr-nurture .phone-screen{background:linear-gradient(160deg,#fce7f3,#fdf2f8);}
-.scr-nurture .phone-screen::before{background:#be185d;}
-.scr-final   .phone-screen{background:linear-gradient(160deg,#ffe4e6,#fff1f2);}
-.scr-final   .phone-screen::before{background:#e11d48;}
-.scr-data    .phone-screen{background:linear-gradient(160deg,#f1f5f9,#f8fafc);}
-.scr-data    .phone-screen::before{background:var(--c-data);}
+.s-entry   .pscr{background:linear-gradient(150deg,#ede9fe,#dbeafe);}
+.s-entry   .pscr::before{background:#6366f1;}
+.s-form    .pscr{background:linear-gradient(150deg,#fff7ed,#fef9c3);}
+.s-form    .pscr::before{background:#f59e0b;}
+.s-game    .pscr{background:linear-gradient(150deg,#d1fae5,#ecfdf5);}
+.s-game    .pscr::before{background:#10b981;}
+.s-r1      .pscr{background:linear-gradient(150deg,#e0f2fe,#f0f9ff);}
+.s-r1      .pscr::before{background:#0ea5e9;}
+.s-r2      .pscr{background:linear-gradient(150deg,#dcfce7,#f0fdf4);}
+.s-r2      .pscr::before{background:#16a34a;}
+.s-r3      .pscr{background:linear-gradient(150deg,#fce7f3,#fdf2f8);}
+.s-r3      .pscr::before{background:#db2777;}
+.s-ecode   .pscr{background:linear-gradient(150deg,#d1fae5,#ecfdf5);}
+.s-ecode   .pscr::before{background:#059669;}
+.s-conv    .pscr{background:linear-gradient(150deg,#dcfce7,#f0fdf4);}
+.s-conv    .pscr::before{background:#22c55e;}
+.s-drop    .pscr{background:linear-gradient(150deg,#fee2e2,#fff1f2);}
+.s-drop    .pscr::before{background:#ef4444;}
+.s-nurt    .pscr{background:linear-gradient(150deg,#fce7f3,#fdf2f8);}
+.s-nurt    .pscr::before{background:#be185d;}
+.s-final   .pscr{background:linear-gradient(150deg,#ffe4e6,#fff1f2);}
+.s-final   .pscr::before{background:#e11d48;}
 
-/* ── Screen content ── */
-.sc{padding:7px 7px 6px;flex:1;display:flex;flex-direction:column;gap:4px;}
+/* ── Screen body ── */
+.sc{padding:6px 7px 5px;flex:1;display:flex;flex-direction:column;gap:3.5px;}
+.sc-tag{font-size:7px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:1.5px 5px;border-radius:3.5px;display:inline-block;align-self:flex-start;}
+.sc-title{font-size:9px;font-weight:800;line-height:1.2;color:#0f172a;}
+.sc-sub{font-size:7px;color:#475569;line-height:1.45;}
+.sc-hr{height:1px;background:rgba(0,0,0,.07);margin:1.5px 0;}
+.ui-inp{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.12);
+  border-radius:4.5px;height:14px;font-size:6.5px;color:#64748b;
+  display:flex;align-items:center;padding:0 5px;}
+.ui-btn{border-radius:4.5px;height:15px;font-size:7px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;color:#fff;}
+.bg-ind{background:#6366f1;} .bg-amb{background:#f59e0b;}
+.bg-grn{background:#10b981;} .bg-pur{background:#8b5cf6;}
+.bg-em{background:#059669;} .bg-sky{background:#0ea5e9;}
+.bg-red{background:#ef4444;} .bg-pk{background:#db2777;}
+.bg-gry{background:#64748b;}
 
-.sc-tag{
-  font-size:7.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 6px;border-radius:4px;display:inline-block;align-self:flex-start;
-}
-.sc-title{font-size:9.5px;font-weight:700;line-height:1.2;color:#1e293b;}
-.sc-sub{font-size:7.5px;color:#475569;line-height:1.4;}
-.sc-divider{height:1px;background:rgba(0,0,0,.06);margin:2px 0;}
+/* ── Point bar ── */
+.pt-bar{height:8px;background:#e2e8f0;border-radius:10px;position:relative;overflow:visible;margin:2px 0;}
+.pt-fill{height:100%;border-radius:10px;transition:width .3s;}
+.pt-mark{position:absolute;top:-3px;width:2px;height:14px;background:#f59e0b;border-radius:1px;}
+.pt-mark-lbl{position:absolute;top:-15px;font-size:5.5px;font-weight:800;color:#b45309;transform:translateX(-50%);}
 
-/* UI elements inside screens */
-.ui-input{
-  background:rgba(255,255,255,.8);
-  border:1px solid rgba(0,0,0,.1);
-  border-radius:5px;
-  height:16px;
-  font-size:7px;color:#64748b;
-  display:flex;align-items:center;padding:0 6px;
-}
-.ui-btn{
-  background:#6366f1;color:#fff;
-  border-radius:5px;height:16px;
-  font-size:7.5px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-}
-.ui-btn.green{background:#10b981;}
-.ui-btn.amber{background:#f59e0b;}
-.ui-btn.purple{background:#8b5cf6;}
-.ui-btn.pink{background:#db2777;}
-.ui-btn.red{background:#ef4444;}
-.ui-btn.gray{background:#64748b;}
-.ui-btn.outline{background:transparent;border:1px solid #6366f1;color:#6366f1;}
+/* ── Game grid ── */
+.gg{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
+.gc{background:rgba(255,255,255,.7);border:1px solid rgba(16,185,129,.3);
+  border-radius:3px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.gc.matched{background:rgba(16,185,129,.2);border-color:#10b981;}
 
-/* Grid for minigame */
-.game-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
-}
-.game-card{
-  background:rgba(255,255,255,.7);
-  border:1px solid rgba(16,185,129,.3);
-  border-radius:4px;
-  height:24px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;
-}
-.game-card.flipped{background:rgba(16,185,129,.15);}
+/* ── Source pills ── */
+.src-pill{background:#fff;border:1.5px solid #a5b4fc;border-radius:10px;
+  padding:5px 12px;font-size:10px;font-weight:600;color:#4338ca;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(99,102,241,.08);}
 
-/* Timer pill */
-.timer-pill{
-  background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);
-  border-radius:10px;padding:1px 6px;
-  font-size:7px;font-weight:700;color:#dc2626;
-  display:inline-flex;align-items:center;gap:2px;
-  align-self:flex-end;
-}
-
-/* Gacha spinning wheel */
-.gacha-wheel{
-  width:60px;height:60px;
-  border-radius:50%;
-  background:conic-gradient(#818cf8 0 120deg,#34d399 120deg 240deg,#f472b6 240deg 360deg);
-  margin:0 auto 4px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 12px rgba(0,0,0,.12);
-}
-.gacha-wheel-inner{
-  width:32px;height:32px;border-radius:50%;background:white;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;
-}
-
-/* Visual result preview */
-.visual-preview{
-  flex:1;border-radius:6px;margin-bottom:3px;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:2px;
-  font-size:18px;
-}
-
-/* Reward badges */
-.reward-badge{
-  background:rgba(255,255,255,.8);
-  border:1px solid rgba(0,0,0,.08);
-  border-radius:6px;
-  padding:3px 5px;
-  font-size:7px;font-weight:600;color:#1e293b;
-  display:flex;align-items:center;gap:3px;
-}
-
-/* Nurture message bubble */
-.msg-bubble{
-  background:rgba(255,255,255,.85);
-  border-radius:6px 6px 6px 2px;
-  padding:4px 6px;
-  font-size:7px;color:#1e293b;line-height:1.4;
-  box-shadow:0 1px 4px rgba(0,0,0,.08);
-}
-
-/* ══════════════════════════════════════════
-   NODE CARD (non-phone info boxes)
-   ══════════════════════════════════════════ */
-.card{
-  position:absolute;
-  background:#fff;
-  border-radius:12px;
-  border:1.5px solid;
-  padding:11px 14px;
-  font-size:11px;
-  box-shadow:0 2px 12px rgba(0,0,0,.06);
-}
-.card-title{font-weight:700;font-size:11.5px;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
-.card-meta{font-size:10px;color:#475569;line-height:1.5;}
-.card-badge{
-  display:inline-block;font-size:9px;font-weight:600;
-  padding:2px 7px;border-radius:4px;margin-top:5px;
-}
-
-/* Source traffic pill cluster */
-.source-cluster{
-  position:absolute;
-  display:flex;flex-direction:column;gap:6px;
-}
-.source-pill{
-  background:#fff;border:1.5px solid #a5b4fc;
-  border-radius:10px;padding:6px 12px;
-  font-size:10px;font-weight:600;color:#4338ca;
-  display:flex;align-items:center;gap:6px;
-  box-shadow:0 2px 8px rgba(99,102,241,.08);
-  white-space:nowrap;
-}
-
-/* Branch labels */
-.branch-label{
-  position:absolute;
-  font-size:10px;font-weight:700;
-  padding:3px 9px;border-radius:6px;
-}
-
-/* Phase header zone */
-.phase-zone{
-  position:absolute;
-  border-radius:16px;
-  border:1.5px dashed;
-}
-.phase-title{
-  position:absolute;
-  font-size:10px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 10px;border-radius:7px;
-  top:-13px;left:16px;
-}
-
-/* ══════════════════════════════════════════
-   LABEL BELOW PHONE
-   ══════════════════════════════════════════ */
-.phone-label{
-  position:absolute;
-  top:calc(var(--phone-h) + 10px);
-  left:50%;
-  transform:translateX(-50%);
-  font-size:9.5px;font-weight:600;
-  color:#475569;
-  text-align:center;
-  white-space:nowrap;
-}
-.phone-step-num{
-  position:absolute;
-  top:-10px;left:50%;transform:translateX(-50%);
+/* ── Step number ── */
+.step-num{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
   width:22px;height:22px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   font-size:10px;font-weight:800;color:#fff;
-  box-shadow:0 2px 6px rgba(0,0,0,.12);
-  z-index:2;
+  box-shadow:0 2px 6px rgba(0,0,0,.14);z-index:2;
 }
 
+/* ── Phone label ── */
+.ph-lbl{
+  position:absolute;
+  top:calc(var(--ph) + 8px);left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:600;color:#475569;text-align:center;white-space:nowrap;
+}
+
+/* ── Sub-case card (Rule panels) ── */
+.scard{
+  position:absolute;background:#fff;border-radius:12px;border:2px solid;
+  padding:10px 12px;font-size:10px;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
+}
+.scard-title{font-weight:800;font-size:11px;display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.scard-row{font-size:9px;color:#475569;line-height:1.5;display:flex;align-items:flex-start;gap:6px;}
+
+/* ── Decision diamond ── */
+.diamond-wrap{position:absolute;display:flex;align-items:center;justify-content:center;}
+.diamond-inner{transform:rotate(45deg);width:80px;height:80px;
+  border:2px solid #f59e0b;background:#fefce8;
+  box-shadow:0 4px 16px rgba(245,158,11,.12);}
+.diamond-txt{position:absolute;text-align:center;z-index:1;}
+
 /* ── SVG arrows ── */
-#arrows{
-  position:absolute;top:0;left:0;
-  width:4200px;height:2600px;
-  pointer-events:none;overflow:visible;
+#arrs{position:absolute;top:0;left:0;width:5400px;height:1150px;
+  pointer-events:none;overflow:visible;}
+
+/* ── Help text on arrows ── */
+.arr-txt{
+  font-size:8.5px;font-weight:700;font-family:'Inter',sans-serif;
+  paint-order:stroke;stroke:#f0f2f7;stroke-width:3px;
 }
 
 </style>
 </head>
 <body>
 
+<!-- TOOLBAR -->
 <div id="toolbar">
-  <h1>📱 Summer Campaign — UI User Flow</h1>
+  <h1>📱 Summer Campaign — User Flow</h1>
+  <span class="badge">v3 Backend Sync</span>
   <div class="sep"></div>
-  <button onclick="doZoom(1.15)">＋</button>
-  <span id="zlbl">65%</span>
-  <button onclick="doZoom(1/1.15)">－</button>
+  <button onclick="dz(1.15)">＋</button>
+  <span id="zlbl">62%</span>
+  <button onclick="dz(1/1.15)">－</button>
   <div class="sep"></div>
-  <button onclick="resetV()">⌂ Reset</button>
+  <button onclick="rv()">⌂ Reset</button>
 </div>
 
 <div id="vp">
 <div id="cv">
 
-<!-- ══════════════════════════════════════════════════════
-     SVG ARROWS
-══════════════════════════════════════════════════════ -->
-<svg id="arrows" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Arrow markers -->
-    <marker id="m-indigo" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#6366f1"/>
-    </marker>
-    <marker id="m-amber" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#f59e0b"/>
-    </marker>
-    <marker id="m-green" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#10b981"/>
-    </marker>
-    <marker id="m-purple" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#8b5cf6"/>
-    </marker>
-    <marker id="m-blue" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#0ea5e9"/>
-    </marker>
-    <marker id="m-emerald" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#059669"/>
-    </marker>
-    <marker id="m-red" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#ef4444"/>
-    </marker>
-    <marker id="m-lime" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#22c55e"/>
-    </marker>
-    <marker id="m-slate" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#64748b"/>
-    </marker>
-    <marker id="m-pink" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-      <polygon points="0 0,9 3.5,0 7" fill="#db2777"/>
-    </marker>
-  </defs>
+<!-- ════════════════════════════════════════
+     SVG ARROWS (UPDATED Y-COORDINATES)
+════════════════════════════════════════ -->
+<svg id="arrs" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="mi" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#6366f1"/></marker>
+  <marker id="ma" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#f59e0b"/></marker>
+  <marker id="mg" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#10b981"/></marker>
+  <marker id="mp" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#8b5cf6"/></marker>
+  <marker id="ms" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#0ea5e9"/></marker>
+  <marker id="me" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#059669"/></marker>
+  <marker id="mr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#ef4444"/></marker>
+  <marker id="ml" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#22c55e"/></marker>
+  <marker id="mk" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#64748b"/></marker>
+  <marker id="mpk" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#db2777"/></marker>
+  <marker id="msk" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#16a34a"/></marker>
+</defs>
 
-  <!-- Sources → QR Entry (Tọa độ tính toán khớp tâm 4 hộp Source Traffic) -->
-  <path d="M 160 343 C 190 343, 200 480, 240 480" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#m-indigo)" stroke-dasharray="4,2" opacity=".6"/>
-  <path d="M 160 374 C 190 374, 200 490, 240 490" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#m-indigo)" stroke-dasharray="4,2" opacity=".6"/>
-  <path d="M 160 405 C 190 405, 200 500, 240 500" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#m-indigo)" stroke-dasharray="4,2" opacity=".6"/>
-  <path d="M 160 436 C 190 436, 200 510, 240 510" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#m-indigo)" stroke-dasharray="4,2" opacity=".6"/>
+<!-- Sources → QR phone -->
+<path d="M 218 410 C 270 410, 300 480, 342 480" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#mi)" opacity=".65" stroke-dasharray="5,3"/>
+<path d="M 218 480 L 342 480" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#mi)" opacity=".65" stroke-dasharray="5,3"/>
+<path d="M 218 550 C 270 550, 300 480, 342 480" stroke="#6366f1" stroke-width="1.8" fill="none" marker-end="url(#mi)" opacity=".65" stroke-dasharray="5,3"/>
 
-  <!-- QR → Mini Program -->
-  <line x1="390" y1="500" x2="490" y2="500" stroke="#6366f1" stroke-width="2.2" marker-end="url(#m-indigo)"/>
-  <text x="440" y="490" font-size="9" fill="#6366f1" font-weight="bold">Scan QR</text>
+<!-- Phone 1 (QR) → Phone 2 (Mini Program) -->
+<line x1="478" y1="480" x2="560" y2="480" stroke="#6366f1" stroke-width="2" marker-end="url(#mi)"/>
+<text x="519" y="472" class="arr-txt" fill="#4338ca" text-anchor="middle">Scan QR</text>
 
-  <!-- Mini Program → OTP -->
-  <line x1="640" y1="500" x2="740" y2="500" stroke="#f59e0b" stroke-width="2.2" marker-end="url(#m-amber)"/>
-  <text x="690" y="490" font-size="9" fill="#b45309" font-weight="bold">Bước 1.1</text>
+<!-- Phone 2 → Phone 3 (Input Form) -->
+<line x1="696" y1="480" x2="776" y2="480" stroke="#f59e0b" stroke-width="2" marker-end="url(#ma)"/>
+<text x="736" y="472" class="arr-txt" fill="#b45309" text-anchor="middle">Bước 1.1</text>
 
-  <!-- OTP → Minigame -->
-  <line x1="890" y1="500" x2="990" y2="500" stroke="#10b981" stroke-width="2.2" marker-end="url(#m-green)"/>
-  <text x="940" y="490" font-size="9" fill="#047857" font-weight="bold">✓ Verified</text>
+<!-- Phone 3 → Backend Processing Stack -->
+<line x1="912" y1="480" x2="950" y2="480" stroke="#f59e0b" stroke-width="2" marker-end="url(#ma)"/>
 
-  <!-- OTP Backend logic sync -->
-  <path d="M 820 640 L 820 680" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,4" fill="none" opacity="0.8"/>
+<!-- Backend Stack → Phone 5 (Minigame) -->
+<line x1="1130" y1="480" x2="1180" y2="480" stroke="#8b5cf6" stroke-width="2" marker-end="url(#mp)"/>
+<text x="1155" y="472" class="arr-txt" fill="#6d28d9" text-anchor="middle">✓ Verified</text>
 
-  <!-- Minigame → Randomizer Backend -->
-  <line x1="1140" y1="500" x2="1260" y2="500" stroke="#8b5cf6" stroke-width="2.2" marker-end="url(#m-purple)"/>
-  <text x="1200" y="490" font-size="9" fill="#6d28d9" font-weight="bold">4 cặp ✓</text>
+<!-- Phone 5 (Minigame) → Randomizer Backend -->
+<line x1="1316" y1="480" x2="1380" y2="480" stroke="#10b981" stroke-width="2" marker-end="url(#mg)"/>
+<text x="1348" y="472" class="arr-txt" fill="#047857" text-anchor="middle">4 cặp ✓ → +1pt</text>
 
-  <!-- Randomizer Backend → 3 Visual branches -->
-  <!-- → Landscape (Y=180) -->
-  <path d="M 1340 500 C 1390 180, 1400 180, 1440 180" stroke="#0ea5e9" stroke-width="2" fill="none" marker-end="url(#m-blue)" opacity=".85"/>
-  <text x="1390" y="175" font-size="9" fill="#0369a1" font-weight="bold" text-anchor="middle" paint-order="stroke" stroke="#f0f2f7" stroke-width="4">Visual Landscape</text>
+<!-- Share loop on game phone -->
+<path d="M 1248 398 C 1288 370, 1326 380, 1286 415" stroke="#10b981" stroke-width="1.4" fill="none" marker-end="url(#mg)" stroke-dasharray="3,2" opacity=".75"/>
+<text x="1323" y="368" font-size="7.5" fill="#047857" font-weight="700" font-family="Inter,sans-serif">Share +1 lượt 🔗</text>
 
-  <!-- → Voucher (Y=500) -->
-  <line x1="1340" y1="500" x2="1440" y2="500" stroke="#16a34a" stroke-width="2" fill="none" marker-end="url(#m-emerald)" opacity=".85"/>
-  <text x="1390" y="492" font-size="9" fill="#15803d" font-weight="bold" text-anchor="middle" paint-order="stroke" stroke="#f0f2f7" stroke-width="4">Visual Voucher</text>
+<!-- Randomizer → 3 RULE CARDS (WIDER SPACING Y: 160, 480, 800) -->
+<path d="M 1460 480 C 1490 160, 1510 160, 1540 160" stroke="#0ea5e9" stroke-width="2.5" fill="none" marker-end="url(#ms)" opacity=".85"/>
+<line x1="1460" y1="480" x2="1540" y2="480" stroke="#16a34a" stroke-width="2.5" marker-end="url(#msk)" opacity=".85"/>
+<path d="M 1460 480 C 1490 800, 1510 800, 1540 800" stroke="#db2777" stroke-width="2.5" fill="none" marker-end="url(#mpk)" opacity=".85"/>
 
-  <!-- → Secret (Y=820) -->
-  <path d="M 1340 500 C 1390 820, 1400 820, 1440 820" stroke="#db2777" stroke-width="2" fill="none" marker-end="url(#m-pink)" opacity=".85"/>
-  <text x="1390" y="810" font-size="9" fill="#be185d" font-weight="bold" text-anchor="middle" paint-order="stroke" stroke="#f0f2f7" stroke-width="4">Visual SECRET ⭐</text>
+<!-- Rule labels on arrows from Randomizer to Cards -->
+<text x="1500" y="300" class="arr-txt" fill="#0369a1" text-anchor="middle">RULE 1: ≥4 pts</text>
+<text x="1500" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">RULE 2: ≥4 pts + KHM</text>
+<text x="1500" y="660" class="arr-txt" fill="#be185d" text-anchor="middle">RULE 3: &gt;6 pts ⭐</text>
 
-  <!-- 3 Visuals → Rewards -->
-  <!-- Landscape → Reward1 -->
-  <line x1="1590" y1="180" x2="1690" y2="180" stroke="#0ea5e9" stroke-width="1.8" marker-end="url(#m-blue)" opacity=".8"/>
-  <!-- Voucher → Reward2 -->
-  <line x1="1590" y1="500" x2="1690" y2="500" stroke="#16a34a" stroke-width="1.8" marker-end="url(#m-emerald)" opacity=".8"/>
-  <!-- Secret → Reward3 -->
-  <line x1="1590" y1="820" x2="1690" y2="820" stroke="#db2777" stroke-width="1.8" marker-end="url(#m-pink)" opacity=".8"/>
+<!-- Rule Cards → Visual Phones -->
+<line x1="1820" y1="160" x2="1900" y2="160" stroke="#0ea5e9" stroke-width="1.8" marker-end="url(#ms)" opacity=".8"/>
+<text x="1860" y="152" class="arr-txt" fill="#0369a1" text-anchor="middle">Hiển thị</text>
+<line x1="1820" y1="480" x2="1900" y2="480" stroke="#16a34a" stroke-width="1.8" marker-end="url(#msk)" opacity=".8"/>
+<text x="1860" y="472" class="arr-txt" fill="#15803d" text-anchor="middle">Hiển thị</text>
+<line x1="1820" y1="800" x2="1900" y2="800" stroke="#db2777" stroke-width="1.8" marker-end="url(#mpk)" opacity=".8"/>
+<text x="1860" y="792" class="arr-txt" fill="#be185d" text-anchor="middle">Hiển thị</text>
 
-  <!-- Rewards merge → Ecode screen -->
-  <path d="M 1840 180 C 1920 180, 1920 500, 1990 500" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#m-emerald)" opacity=".75"/>
-  <path d="M 1840 500 L 1990 500" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#m-emerald)" opacity=".75"/>
-  <path d="M 1840 820 C 1920 820, 1920 500, 1990 500" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#m-emerald)" opacity=".75"/>
+<!-- Visual Phones → Ecode merge -->
+<path d="M 2036 160 C 2090 160, 2110 480, 2180 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
+<line x1="2036" y1="480" x2="2180" y2="480" stroke="#059669" stroke-width="1.8" marker-end="url(#me)" opacity=".7"/>
+<path d="M 2036 800 C 2090 800, 2110 480, 2180 480" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#me)" opacity=".7"/>
 
-  <!-- Ecode → Decision diamond -->
-  <line x1="2140" y1="500" x2="2240" y2="500" stroke="#f59e0b" stroke-width="2.2" marker-end="url(#m-amber)"/>
+<!-- Ecode → Decision -->
+<line x1="2316" y1="480" x2="2400" y2="480" stroke="#f59e0b" stroke-width="2" marker-end="url(#ma)"/>
 
-  <!-- Decision → Converted (up, Y=290) -->
-  <path d="M 2330 500 C 2380 500, 2410 290, 2490 290" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#m-lime)"/>
-  <text x="2400" y="280" font-size="10" fill="#15803d" font-weight="bold">✓ ĐÃ MUA</text>
+<!-- Decision → Converted (top) -->
+<path d="M 2480 440 C 2480 330, 2550 330, 2600 330" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#ml)"/>
+<text x="2540" y="322" class="arr-txt" fill="#15803d" font-weight="800" text-anchor="middle">✓ ĐÃ MUA</text>
 
-  <!-- Converted → End -->
-  <line x1="2640" y1="290" x2="2720" y2="290" stroke="#22c55e" stroke-width="1.8" marker-end="url(#m-lime)" stroke-dasharray="4,3"/>
+<!-- Converted → End -->
+<line x1="2736" y1="330" x2="2840" y2="330" stroke="#22c55e" stroke-width="1.8" marker-end="url(#ml)" stroke-dasharray="4,3"/>
 
-  <!-- Decision → Drop-off (down, Y=640) -->
-  <path d="M 2330 500 C 2380 500, 2410 640, 2490 640" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#m-red)"/>
-  <text x="2400" y="660" font-size="10" fill="#b91c1c" font-weight="bold">✗ CHƯA MUA</text>
+<!-- Decision → Drop-off (bottom) -->
+<path d="M 2480 520 C 2480 630, 2550 630, 2600 630" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#mr)"/>
+<text x="2540" y="646" class="arr-txt" fill="#b91c1c" font-weight="800" text-anchor="middle">✗ CHƯA MUA</text>
 
-  <!-- Nurturing flow: Drop-off → D+1 → D+3&5 → D+10 → Data -->
-  <line x1="2640" y1="640" x2="2740" y2="640" stroke="#ef4444" stroke-width="2" marker-end="url(#m-red)"/>
-  <text x="2690" y="630" font-size="9" fill="#b91c1c" font-weight="bold">D+1</text>
-  
-  <line x1="2890" y1="640" x2="2990" y2="640" stroke="#be185d" stroke-width="2" marker-end="url(#m-pink)"/>
-  <text x="2940" y="630" font-size="9" fill="#9d174d" font-weight="bold">D+3 / D+5</text>
-  
-  <line x1="3140" y1="640" x2="3240" y2="640" stroke="#e11d48" stroke-width="2" marker-end="url(#m-red)"/>
-  <text x="3190" y="630" font-size="9" fill="#be123c" font-weight="bold">D+10</text>
-  
-  <line x1="3390" y1="640" x2="3490" y2="640" stroke="#64748b" stroke-width="1.8" marker-end="url(#m-slate)" stroke-dasharray="4,3"/>
-  <text x="3440" y="630" font-size="9" fill="#475569" font-weight="bold">Data CN</text>
+<!-- Nurturing chain -->
+<line x1="2736" y1="630" x2="2840" y2="630" stroke="#ef4444" stroke-width="2" marker-end="url(#mr)"/>
+<text x="2788" y="620" class="arr-txt" fill="#b91c1c" text-anchor="middle">Stage 1</text>
 
-  <!-- Share → +1 turn -->
-  <path d="M 1080 430 C 1120 410, 1160 425, 1120 460" stroke="#10b981" stroke-width="1.5" fill="none" marker-end="url(#m-green)" stroke-dasharray="3,2" opacity=".7"/>
-  <text x="1150" y="418" font-size="8" fill="#047857" font-weight="bold">Share +1🔄</text>
+<line x1="2976" y1="630" x2="3080" y2="630" stroke="#be185d" stroke-width="2" marker-end="url(#mpk)"/>
+<text x="3028" y="620" class="arr-txt" fill="#9d174d" text-anchor="middle">Stage 2</text>
+
+<line x1="3216" y1="630" x2="3320" y2="630" stroke="#e11d48" stroke-width="2" marker-end="url(#mr)"/>
+<text x="3268" y="620" class="arr-txt" fill="#be123c" text-anchor="middle">Stage 3</text>
+
+<line x1="3456" y1="630" x2="3560" y2="630" stroke="#64748b" stroke-width="1.8" marker-end="url(#mk)" stroke-dasharray="4,3"/>
+<text x="3508" y="620" class="arr-txt" fill="#475569" text-anchor="middle">Data CN</text>
+
 </svg>
 
 
-<!-- ══════════════════════════════════════════════════════
-     PHASE ZONES
-══════════════════════════════════════════════════════ -->
-
-<div class="phase-zone" style="left:20px;top:260px;width:370px;height:450px;border-color:#c7d2fe;background:rgba(238,242,255,.4);">
-  <div class="phase-title" style="background:#e0e7ff;color:#3730a3;">📲 Điểm Vào (Entry)</div>
+<!-- ════════════════════════════════════════
+     PHASE ZONES (SHIFTED Y)
+════════════════════════════════════════ -->
+<!-- Entry -->
+<div class="zone" style="left:40px;top:145px;width:890px;height:590px;border-color:#c7d2fe;background:rgba(238,242,255,.35);">
+  <div class="zone-lbl" style="background:#e0e7ff;color:#3730a3;">📲 Điểm Vào & Định danh</div>
 </div>
-
-<div class="phase-zone" style="left:460px;top:260px;width:720px;height:450px;border-color:#a7f3d0;background:rgba(209,250,229,.3);">
-  <div class="phase-title" style="background:#d1fae5;color:#065f46;">🎮 Bước 1 — Gamification</div>
+<!-- Gamification -->
+<div class="zone" style="left:1140px;top:145px;width:220px;height:590px;border-color:#a7f3d0;background:rgba(209,250,229,.3);">
+  <div class="zone-lbl" style="background:#d1fae5;color:#065f46;">🎮 Bước 1.2 — Gamification</div>
 </div>
-
-<div class="phase-zone" style="left:1240px;top:0px;width:380px;height:1000px;border-color:#ddd6fe;background:rgba(237,233,254,.3);">
-  <div class="phase-title" style="background:#ede9fe;color:#4c1d95;">⚙️ Bước 2 — System Randomizer</div>
+<!-- Gacha & Reward Matrix -->
+<div class="zone" style="left:1350px;top:10px;width:710px;height:980px;border-color:#ddd6fe;background:rgba(237,233,254,.25);">
+  <div class="zone-lbl" style="background:#ede9fe;color:#4c1d95;">🎲 Hệ Thống Randomizer & Ma Trận Trả Thưởng</div>
 </div>
-
-<div class="phase-zone" style="left:1660px;top:0px;width:490px;height:1000px;border-color:#a7f3d0;background:rgba(209,250,229,.25);">
-  <div class="phase-title" style="background:#d1fae5;color:#065f46;">🎁 Bước 3 — Reward</div>
+<!-- Post-reward -->
+<div class="zone" style="left:2370px;top:150px;width:400px;height:595px;border-color:#fde68a;background:rgba(254,252,232,.35);">
+  <div class="zone-lbl" style="background:#fef9c3;color:#713f12;">⚖️ Phân Nhánh Hành Vi</div>
 </div>
-
-<div class="phase-zone" style="left:2210px;top:100px;width:480px;height:840px;border-color:#fde68a;background:rgba(254,252,232,.4);">
-  <div class="phase-title" style="background:#fef9c3;color:#713f12;">⚖️ Phân Nhánh Hành Vi</div>
-</div>
-
-<div class="phase-zone" style="left:2720px;top:470px;width:1020px;height:350px;border-color:#fecaca;background:rgba(254,226,226,.25);">
-  <div class="phase-title" style="background:#ffe4e6;color:#9f1239;">📧 Nurturing Flow — Nhánh B (Drop-off)</div>
+<!-- Nurturing -->
+<div class="zone" style="left:2600px;top:480px;width:1000px;height:295px;border-color:#fecaca;background:rgba(254,226,226,.22);">
+  <div class="zone-lbl" style="background:#ffe4e6;color:#9f1239;">📧 Nurturing Flow — Nhánh B</div>
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════
-     SOURCE TRAFFIC CLUSTER
-══════════════════════════════════════════════════════ -->
-<div class="source-cluster" style="left:40px;top:328px;">
-  <div class="source-pill">🤝 Affiliate</div>
-  <div class="source-pill">🏢 PTTT CN</div>
-  <div class="source-pill">📣 Paid Ads</div>
-  <div class="source-pill">🔁 Retargeting CT SN38</div>
-</div>
-<div style="position:absolute;left:40px;top:600px;font-size:9px;color:#94a3b8;font-style:italic;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:5px;padding:3px 8px;width:152px;">
-  🔗 UTM tracking link đính kèm
+<!-- ════════════════════════════════════════
+     SOURCE TRAFFIC
+════════════════════════════════════════ -->
+<div style="position:absolute;left:50px;top:365px;display:flex;flex-direction:column;gap:8px;">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:9.5px;font-weight:700;color:#4338ca;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">📡 Source Traffic</div>
+  <div class="src-pill">🏢 PTTT CN</div>
+  <div class="src-pill">📣 Paid Ads</div>
+  <div class="src-pill">🔁 Retargeting CT SN38</div>
+  <div style="font-size:8.5px;color:#94a3b8;font-style:italic;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:5px;padding:3px 7px;margin-top:2px;width:152px;">🔗 UTM tracking link</div>
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 1 — QR SCAN / LANDING
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-entry" style="left:250px;top:360px;">
-  <div class="phone-step-num" style="background:#6366f1;">📲</div>
-  <div class="phone-screen">
+<!-- ════════════════════════════════════════
+     SCREEN 1 — QR / LANDING
+════════════════════════════════════════ -->
+<div class="phone s-entry" style="left:342px;top:344px;">
+  <div class="step-num" style="background:#6366f1;">📲</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#e0e7ff;color:#3730a3;">Mini Program</div>
+      <div class="sc-tag" style="background:#e0e7ff;color:#3730a3;">Landing Page</div>
       <div class="sc-title">Summer Campaign ☀️</div>
-      <div class="sc-sub">Quét QR để bắt đầu</div>
-      <div class="sc-divider"></div>
-      <div style="background:rgba(255,255,255,.8);border-radius:6px;display:flex;align-items:center;justify-content:center;height:60px;border:1px solid #c7d2fe;">
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:50px;">
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:1/3;grid-row:1/3;"></div>
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:4/6;grid-row:1/3;"></div>
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:2;grid-row:3;"></div>
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:1/3;grid-row:4/6;"></div>
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:3;grid-row:3/5;"></div>
-          <div style="width:8px;height:8px;background:#1e293b;border-radius:1px;grid-column:4/6;grid-row:4/6;"></div>
-        </div>
+      <div class="sc-sub">Quét QR để tham gia</div>
+      <div class="sc-hr"></div>
+      <div style="background:rgba(255,255,255,.85);border-radius:5px;height:66px;border:1px solid #c7d2fe;display:flex;align-items:center;justify-content:center;margin:2px 0;">
+        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="18" height="18" rx="2" fill="#1e293b"/><rect x="5" y="5" width="12" height="12" rx="1" fill="#fff"/><rect x="8" y="8" width="6" height="6" fill="#1e293b"/>
+          <rect x="28" y="2" width="18" height="18" rx="2" fill="#1e293b"/><rect x="31" y="5" width="12" height="12" rx="1" fill="#fff"/><rect x="34" y="8" width="6" height="6" fill="#1e293b"/>
+          <rect x="2" y="28" width="18" height="18" rx="2" fill="#1e293b"/><rect x="5" y="31" width="12" height="12" rx="1" fill="#fff"/><rect x="8" y="34" width="6" height="6" fill="#1e293b"/>
+          <rect x="28" y="28" width="6" height="6" fill="#1e293b"/><rect x="36" y="28" width="6" height="6" fill="#1e293b"/>
+          <rect x="28" y="36" width="6" height="6" fill="#1e293b"/><rect x="36" y="40" width="6" height="4" fill="#1e293b"/>
+          <rect x="22" y="2" width="4" height="4" fill="#1e293b"/><rect x="22" y="8" width="4" height="4" fill="#1e293b"/>
+          <rect x="22" y="22" width="4" height="4" fill="#1e293b"/><rect x="2" y="22" width="4" height="4" fill="#1e293b"/>
+        </svg>
       </div>
-      <div class="ui-btn" style="background:#6366f1;margin-top:2px;">Bắt đầu →</div>
+      <div class="ui-btn bg-ind">Bắt đầu →</div>
     </div>
   </div>
-  <div class="phone-label">Màn Hình Landing</div>
+  <div class="ph-lbl">Màn hình Landing</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 2 — MINI PROGRAM HOME
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-entry" style="left:500px;top:360px;">
-  <div class="phone-step-num" style="background:#6366f1;">🚀</div>
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     SCREEN 2 — MINI PROGRAM ENTRY
+════════════════════════════════════════ -->
+<div class="phone s-entry" style="left:560px;top:344px;">
+  <div class="step-num" style="background:#6366f1;">🚀</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
       <div class="sc-tag" style="background:#e0e7ff;color:#3730a3;">Mini Program</div>
       <div class="sc-title">Chào mừng! 👋</div>
-      <div class="sc-sub">Tham gia minigame<br>nhận quà hấp dẫn</div>
-      <div class="sc-divider"></div>
-      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;padding:8px 6px;text-align:center;margin:2px 0;">
-        <div style="font-size:18px;margin-bottom:2px;">💍</div>
-        <div style="font-size:7px;font-weight:700;color:#fff;">Tìm cặp trang sức</div>
-        <div style="font-size:6.5px;color:rgba(255,255,255,.8);">Nhận Ecode & quà tặng</div>
+      <div class="sc-sub">Tham gia minigame<br>nhận Ecode & quà tặng</div>
+      <div class="sc-hr"></div>
+      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:7px;padding:9px 6px;text-align:center;">
+        <div style="font-size:20px;margin-bottom:2px;">💍</div>
+        <div style="font-size:7px;font-weight:800;color:#fff;line-height:1.3;">Tìm cặp trang sức<br>Nhận quà hấp dẫn!</div>
       </div>
-      <div class="ui-btn">Tham gia ngay →</div>
+      <div class="ui-btn bg-ind" style="margin-top:2px;">Tham gia ngay →</div>
     </div>
   </div>
-  <div class="phone-label">Vào Mini Program</div>
+  <div class="ph-lbl">Vào Mini Program</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 3 — OTP VERIFICATION
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-otp" style="left:750px;top:360px;">
-  <div class="phone-step-num" style="background:#f59e0b;">🔐</div>
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     SCREEN 3 — INPUT FORM
+════════════════════════════════════════ -->
+<div class="phone s-form" style="left:776px;top:344px;">
+  <div class="step-num" style="background:#f59e0b;">📋</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#fef9c3;color:#713f12;">Bước 1.1 — OTP</div>
-      <div class="sc-title">Xác minh số điện thoại</div>
-      <div class="sc-sub">Để xác thực & phân loại<br>tài khoản của bạn</div>
-      <div class="sc-divider"></div>
-      <div class="ui-input" style="border-color:#fde68a;">📱 0901 *** ***</div>
-      <div class="ui-input" style="border-color:#fde68a;margin-top:3px;">🔑 Nhập mã OTP</div>
-      <div class="ui-btn amber" style="margin-top:6px;">Xác nhận ✓</div>
+      <div class="sc-tag" style="background:#fef9c3;color:#713f12;">Bước 1.1 — Định danh</div>
+      <div class="sc-title">Nhập thông tin</div>
+      <div class="sc-sub">Xác nhận để tham gia</div>
+      <div class="sc-hr"></div>
+      <div class="ui-inp" style="border-color:#fde68a;">👤 Họ & Tên</div>
+      <div class="ui-inp" style="border-color:#fde68a;margin-top:3px;">📱 Số điện thoại</div>
+      <div style="background:#fff7ed;border:1px solid #fde68a;border-radius:4px;padding:3px 5px;font-size:6.5px;color:#78350f;line-height:1.45;margin-top:2px;">
+        🔄 Submit đẩy hệ thống<br>để xử lý & phân loại KH
+      </div>
+      <div class="ui-btn bg-amb" style="margin-top:auto;">Xác nhận →</div>
     </div>
   </div>
-  <div class="phone-label">Xác minh OTP</div>
+  <div class="ph-lbl">Nhập Họ & Tên + SĐT</div>
 </div>
 
-<!-- Backend logic note for OTP -->
-<div class="card" style="left:750px;top:680px;width:140px;border-color:#f59e0b;border-style:dashed;background:#fffbeb;">
-  <div class="card-title" style="color:#b45309;">⚙️ Backend Rule</div>
-  <div class="card-meta" style="color:#92400e;">
-    - Verify SĐT (chống fraud)<br>
-    - Sync dữ liệu CDP PNJ<br>
-    - <strong>Phân loại KHM / KHC ngầm</strong>
+
+<!-- ════════════════════════════════════════
+     BACKEND RULES STACK (OTP & CDP)
+════════════════════════════════════════ -->
+<div style="position:absolute;left:950px;top:385px;display:flex;flex-direction:column;gap:18px;width:180px;z-index:10;">
+  
+  <!-- OTP Verification Block -->
+  <div style="background:#fff;border:2px solid #64748b;border-radius:10px;padding:12px;box-shadow:0 4px 15px rgba(0,0,0,.06);position:relative;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="font-size:10px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:4px;"><span>🔐</span> Xác minh OTP</div>
+      <div style="background:#f1f5f9;border:1.5px dashed #94a3b8;color:#64748b;font-size:7.5px;font-weight:700;padding:2px 5px;border-radius:5px;">⚠️ T.B.U</div>
+    </div>
+    <div style="font-size:8.5px;color:#475569;line-height:1.45;">
+      Quy trình xử lý backend gửi mã OTP chống fraud.<br>
+      <span style="font-style:italic;color:#94a3b8;">(Luồng này chưa confirm sẽ triển khai chính thức)</span>
+    </div>
+    <div style="position:absolute;top:-10px;left:10px;background:#f8fafc;padding:0 5px;font-size:8px;font-weight:800;color:#64748b;">⚙️ BACKEND RULE</div>
   </div>
+
+  <!-- CDP Sync Block -->
+  <div style="background:#fff;border:2px solid #8b5cf6;border-radius:10px;padding:12px;box-shadow:0 4px 15px rgba(0,0,0,.06);position:relative;">
+    <div style="font-size:10px;font-weight:800;color:#4c1d95;display:flex;align-items:center;gap:4px;margin-bottom:6px;"><span>⚡</span> CDP PNJ Sync</div>
+    <div style="font-size:8.5px;color:#5b21b6;line-height:1.45;">
+      Hệ thống check dữ liệu SĐT để phân loại ngầm:<br>
+      <span style="display:inline-block;margin-top:3px;background:#f5f3ff;padding:3px 6px;border-radius:4px;border:1px solid #ddd6fe;">
+        → <strong>KHM</strong>: Khách hàng Mới<br>
+        → <strong>KHC</strong>: Khách hàng Cũ
+      </span>
+    </div>
+    <div style="position:absolute;top:-10px;left:10px;background:#f8fafc;padding:0 5px;font-size:8px;font-weight:800;color:#8b5cf6;">⚙️ BACKEND RULE</div>
+  </div>
+
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SCREEN 4 — MINIGAME
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-game" style="left:1000px;top:360px;">
-  <div class="phone-step-num" style="background:#10b981;">🎮</div>
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     SCREEN 5 — MINIGAME + POINTS
+════════════════════════════════════════ -->
+<div class="phone s-game" style="left:1180px;top:344px;">
+  <div class="step-num" style="background:#10b981;">🎮</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Bước 1 — Minigame</div>
+      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Bước 1.2 — Gamification</div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div class="sc-title" style="font-size:8.5px;">Tìm cặp trang sức 💎</div>
-        <div class="timer-pill">⏱ 12s</div>
+        <div class="sc-title" style="font-size:8px;">💎 Tìm cặp trang sức</div>
+        <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:1px 5px;font-size:6.5px;font-weight:700;color:#dc2626;">⏱ 13s</div>
       </div>
-      <div class="game-grid" style="margin:3px 0;">
-        <div class="game-card">💍</div>
-        <div class="game-card flipped">⌛</div>
-        <div class="game-card">💎</div>
-        <div class="game-card flipped">⌛</div>
-        <div class="game-card">🔮</div>
-        <div class="game-card">💍</div>
+      <!-- Game grid 4x2 for 4 pairs -->
+      <div class="gg" style="grid-template-columns:repeat(4,1fr);margin-top:2px;">
+        <div class="gc matched">💍</div>
+        <div class="gc">❓</div>
+        <div class="gc matched">💍</div>
+        <div class="gc">❓</div>
+        <div class="gc">❓</div>
+        <div class="gc matched">🔮</div>
+        <div class="gc">❓</div>
+        <div class="gc matched">🔮</div>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-        <div style="font-size:7px;color:#047857;font-weight:600;">🎟 Lượt: 2/2</div>
-        <div style="font-size:7px;color:#047857;font-weight:600;">✓ 2/4 cặp</div>
+      <!-- Point accumulation bar -->
+      <div style="margin-top:3px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+          <div style="font-size:6.5px;font-weight:700;color:#047857;">🏅 Điểm tích lũy</div>
+          <div style="font-size:7px;font-weight:800;color:#059669;">2 pts</div>
+        </div>
+        <div class="pt-bar">
+          <div class="pt-fill" style="width:28%;background:linear-gradient(90deg,#34d399,#10b981);"></div>
+          <div class="pt-mark" style="left:57%;"><div class="pt-mark-lbl">4pt</div></div>
+          <div class="pt-mark" style="left:86%;background:#db2777;"><div class="pt-mark-lbl" style="color:#9d174d;">7pt</div></div>
+        </div>
       </div>
-      <div class="ui-btn outline" style="border-color:#10b981;color:#047857;font-size:6.5px;height:14px;margin-top:3px;">🔗 Chia sẻ +1 lượt</div>
+      <div style="display:flex;gap:3px;margin-top:2px;">
+        <div style="flex:1;background:#d1fae5;border-radius:3px;padding:2px 3px;font-size:6px;color:#047857;font-weight:600;text-align:center;">🎟 Lượt: 2</div>
+        <div style="flex:1;background:#d1fae5;border-radius:3px;padding:2px 3px;font-size:6px;color:#047857;font-weight:600;text-align:center;">✓ 2/4 cặp</div>
+      </div>
+      <div class="ui-btn" style="background:transparent;border:1px solid #10b981;color:#047857;font-size:6px;height:13px;margin-top:auto;">🔗 Share +1 lượt</div>
     </div>
   </div>
-  <div class="phone-label">Minigame<br><span style="color:#047857;font-size:8.5px;">4 cặp • 10-15s • 2 lượt mặc định</span></div>
+  <div class="ph-lbl">Minigame<br><span style="color:#047857;font-size:7.5px;">1 lượt hoàn thành = +1 điểm</span></div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
+<!-- Point system explainer card -->
+<div style="position:absolute;left:1130px;top:670px;background:#fff;border:1.5px solid #a7f3d0;border-radius:9px;padding:8px 10px;width:235px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:9.5px;font-weight:800;color:#047857;margin-bottom:5px;">📊 Cơ chế Tích Điểm</div>
+  <div style="font-size:8.5px;color:#334155;line-height:1.65;">
+    🎟 Mặc định: <strong>2 lượt/KH</strong><br>
+    🔗 Share thành công: <strong>+1 lượt</strong>/lần<br>
+    🏅 Hoàn thành 1 lượt (4 cặp) = <strong>+1 điểm</strong><br>
+    📈 Chơi càng nhiều → điểm càng cao
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
      BACKEND NODE — GACHA / RANDOMIZER
-══════════════════════════════════════════════════════ -->
-<div style="position:absolute;left:1250px;top:450px;width:140px;text-align:center;">
-  <div style="width:70px;height:70px;background:#ede9fe;border:2.5px dashed #8b5cf6;border-radius:14px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px;transform:rotate(45deg);box-shadow:0 8px 16px rgba(139,92,246,.15);">
-     <div style="transform:rotate(-45deg);">🎲</div>
+════════════════════════════════════════ -->
+<div style="position:absolute;left:1380px;top:445px;width:80px;height:80px;display:flex;align-items:center;justify-content:center;z-index:10;">
+  <div style="transform:rotate(45deg);width:55px;height:55px;background:#ede9fe;border:2.5px solid #8b5cf6;border-radius:12px;box-shadow:0 6px 16px rgba(139,92,246,.18);position:absolute;"></div>
+  <div style="position:relative;text-align:center;z-index:2;">
+     <div style="font-size:24px;line-height:1;margin-bottom:2px;">🎲</div>
   </div>
-  <div style="margin-top:18px;font-size:10.5px;font-weight:bold;color:#4c1d95;line-height:1.3;background:#f5f3ff;padding:4px 8px;border-radius:6px;display:inline-block;border:1px solid #ddd6fe;">HỆ THỐNG RANDOMIZER</div>
+  <div style="position:absolute;top:85px;width:160px;text-align:center;">
+     <div style="font-size:9px;font-weight:800;color:#4c1d95;background:#f5f3ff;border:1.5px solid #ddd6fe;padding:4px 8px;border-radius:6px;display:inline-block;">HỆ THỐNG RANDOMIZER</div>
+  </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     3 VISUAL RESULT SCREENS
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-landscape" style="left:1450px;top:40px;">
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     3 RULE CARDS (LOGIC)
+════════════════════════════════════════ -->
+
+<!-- RULE 1 CARD -->
+<div class="scard" style="left:1540px;top:90px;width:280px;border-color:#7dd3fc;background:linear-gradient(135deg,#fff,#f0f9ff);">
+  <div class="scard-title" style="color:#0369a1;font-size:11.5px;">🖼 Rule 1 — Visual Landscape <span style="font-size:9px;font-weight:600;color:#64748b;margin-left:4px;padding:2px 5px;background:#e2e8f0;border-radius:4px;">Áp dụng KHM & KHC</span></div>
+  <div style="font-size:8.5px;color:#0369a1;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt từ 4 điểm</div>
+  
+  <div style="background:#e0f2fe;border-radius:6px;padding:6px 8px;margin-bottom:5px;">
+    <div style="font-size:9px;font-weight:800;color:#0369a1;margin-bottom:3px;">Trường hợp 1 ✅</div>
+    <div class="scard-row"><span style="color:#0369a1;">🎁</span><span><strong>Ecode Omni + E-Voucher F&B</strong><br><span style="font-size:8.5px;color:#475569;">Còn quà F&B & KH chưa nhận ưu đãi của Brand đó. (Hệ thống loại trừ brand KH đã nhận ở lượt trước).</span></span></div>
+  </div>
+  
+  <div style="background:#f1f5f9;border-radius:6px;padding:6px 8px;">
+    <div style="font-size:9px;font-weight:800;color:#475569;margin-bottom:3px;">Trường hợp 2 ⚙️</div>
+    <div class="scard-row"><span style="color:#475569;">🎟</span><span><strong>Ecode Omni Only</strong><br><span style="font-size:8.5px;color:#64748b;">Hết quỹ F&B hoặc KH đã nhận đủ tất cả brand F&B.</span></span></div>
+  </div>
+</div>
+
+<!-- RULE 2 CARD -->
+<div class="scard" style="left:1540px;top:410px;width:280px;border-color:#4ade80;background:linear-gradient(135deg,#fff,#f0fdf4);">
+  <div class="scard-title" style="color:#15803d;font-size:11.5px;">🎫 Rule 2 — Visual Voucher <span style="font-size:9px;font-weight:600;color:#78350f;margin-left:4px;padding:2px 5px;background:#fef9c3;border-radius:4px;">Chỉ KHM</span></div>
+  <div style="font-size:8.5px;color:#15803d;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt từ 4 điểm • Max 1 quà/KH</div>
+
+  <div style="background:#dcfce7;border-radius:6px;padding:6px 8px;margin-bottom:5px;">
+    <div style="font-size:9px;font-weight:800;color:#15803d;margin-bottom:3px;">Trường hợp 1 ✅</div>
+    <div class="scard-row"><span style="color:#15803d;">🎁</span><span><strong>Phiếu quà 100k + Ecode Omni</strong><br><span style="font-size:8.5px;color:#475569;">Kho còn phiếu & Khách chưa từng nhận phiếu 100k.</span></span></div>
+  </div>
+  
+  <div style="background:#f1f5f9;border-radius:6px;padding:6px 8px;">
+    <div style="font-size:9px;font-weight:800;color:#475569;margin-bottom:3px;">Trường hợp 2 ⚙️</div>
+    <div class="scard-row"><span style="color:#475569;">🎟</span><span><strong>Ecode Omni Only</strong><br><span style="font-size:8.5px;color:#64748b;">Hết phiếu 100k hoặc KH đã nhận phiếu ở lượt trước.</span></span></div>
+  </div>
+</div>
+
+<!-- RULE 3 CARD -->
+<div class="scard" style="left:1540px;top:730px;width:280px;border-color:#f9a8d4;background:linear-gradient(135deg,#fff,#fdf2f8);">
+  <div class="scard-title" style="color:#9d174d;font-size:11.5px;">💎 Rule 3 — Visual SECRET <span style="font-size:9px;font-weight:600;color:#9d174d;margin-left:4px;padding:2px 5px;background:#fce7f3;border-radius:4px;">Hiếm</span></div>
+  <div style="font-size:8.5px;color:#9d174d;font-weight:700;margin-bottom:6px;">Điều kiện: KH đạt &gt;6 điểm</div>
+
+  <div style="background:#fce7f3;border-radius:6px;padding:6px 8px;margin-bottom:5px;">
+    <div style="font-size:9px;font-weight:800;color:#9d174d;margin-bottom:3px;">Phần thưởng ✅</div>
+    <div class="scard-row"><span style="color:#9d174d;">🏆</span><span><strong>Ecode Omni + Quà Trang Sức</strong></span></div>
+  </div>
+  
+  <div style="background:#fff1f2;border:1.5px dashed #fda4af;border-radius:6px;padding:6px 8px;">
+    <div style="font-size:9px;font-weight:800;color:#be123c;margin-bottom:4px;">⚠️ Ràng buộc bắt buộc:</div>
+    <div class="scard-row" style="margin-bottom:3px;"><span>🛒</span><span style="font-size:8.5px;">Phải <strong>phát sinh Giao dịch</strong> trong campaign</span></div>
+    <div class="scard-row" style="margin-bottom:3px;"><span>👤</span><span style="font-size:8.5px;"><strong>1 KH / 1 lần</strong> / 1 campaign</span></div>
+    <div class="scard-row" style="margin-bottom:3px;"><span>🚫</span><span style="font-size:8.5px;">Không áp dụng tài khoản <strong>nội bộ PNJ</strong></span></div>
+    <div class="scard-row"><span>🎯</span><span style="font-size:8.5px;">Giới hạn toàn campaign: <strong>4 giải</strong></span></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     3 VISUAL PHONES (UI HIỂN THỊ)
+════════════════════════════════════════ -->
+
+<!-- Phone Visual 1 -->
+<div class="phone s-r1" style="left:1900px;top:24px;">
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#e0f2fe;color:#0369a1;">Kết quả Visual</div>
-      <div class="visual-preview" style="background:linear-gradient(135deg,#bae6fd,#e0f7fa);">
-        <span style="font-size:22px;">🌄</span>
-        <div style="font-size:6.5px;font-weight:bold;color:#0369a1;text-align:center;">Visual Landscape<br>Hình thông điệp</div>
+      <div class="sc-tag" style="background:#e0f2fe;color:#0369a1;">Kết Quả Visual</div>
+      <div class="sc-title" style="font-size:8.5px;text-align:center;margin-top:2px;">Hình ảnh Landscape</div>
+      <div style="background:linear-gradient(135deg,#bae6fd,#e0f7fa);border-radius:6px;height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;margin:4px 0;">
+        <span style="font-size:32px;">🌄</span>
+        <div style="font-size:7px;font-weight:700;color:#0369a1;text-align:center;">Phong cảnh truyền<br>cảm hứng</div>
       </div>
-      <div style="font-size:7px;color:#0369a1;text-align:center;font-weight:bold;">5 – 10 hình dự kiến</div>
+      <div style="font-size:7px;color:#0369a1;font-weight:600;text-align:center;margin-top:auto;">Hệ thống lấy random 1<br>trong 5–10 hình dự kiến</div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#0369a1;">Landscape</div>
+  <div class="ph-lbl" style="color:#0369a1;font-size:8px;">Visual Landscape</div>
 </div>
 
-<div class="phone scr-voucher" style="left:1450px;top:360px;">
-  <div class="phone-screen">
+<!-- Phone Visual 2 -->
+<div class="phone s-r2" style="left:1900px;top:344px;">
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#dcfce7;color:#15803d;">Kết quả Visual</div>
-      <div class="visual-preview" style="background:linear-gradient(135deg,#bbf7d0,#d1fae5);">
-        <span style="font-size:22px;">🎫</span>
-        <div style="font-size:6.5px;font-weight:bold;color:#15803d;text-align:center;">Visual Voucher<br>Mã khuyến mãi</div>
+      <div class="sc-tag" style="background:#dcfce7;color:#15803d;">Kết Quả Visual</div>
+      <div class="sc-title" style="font-size:8.5px;text-align:center;margin-top:2px;">Phiếu quà tặng</div>
+      <div style="background:linear-gradient(135deg,#bbf7d0,#d1fae5);border-radius:6px;height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;margin:4px 0;">
+        <span style="font-size:32px;">🎫</span>
+        <div style="font-size:7px;font-weight:700;color:#15803d;text-align:center;">Mã khuyến mãi</div>
       </div>
-      <div style="font-size:7px;color:#15803d;text-align:center;font-weight:bold;">Hiển thị ưu đãi</div>
+      <div style="font-size:7px;color:#15803d;font-weight:600;text-align:center;margin-top:auto;">Hiển thị trực quan<br>phiếu ưu đãi trên app</div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#15803d;">Voucher</div>
+  <div class="ph-lbl" style="color:#15803d;font-size:8px;">Visual Voucher</div>
 </div>
 
-<div class="phone scr-secret" style="left:1450px;top:680px;">
-  <div class="phone-screen">
+<!-- Phone Visual 3 -->
+<div class="phone s-r3" style="left:1900px;top:664px;">
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">Kết quả Visual ⭐</div>
-      <div class="visual-preview" style="background:linear-gradient(135deg,#fbcfe8,#fce7f3);">
-        <span style="font-size:22px;">💎</span>
-        <div style="font-size:6.5px;font-weight:bold;color:#9d174d;text-align:center;">Visual SECRET<br>Sản phẩm trang sức</div>
+      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">Kết Quả Visual ⭐</div>
+      <div class="sc-title" style="font-size:8.5px;text-align:center;margin-top:2px;">Sản phẩm Trang sức</div>
+      <div style="background:linear-gradient(135deg,#fbcfe8,#fce7f3);border-radius:6px;height:120px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;margin:4px 0;">
+        <span style="font-size:32px;">💎</span>
+        <div style="font-size:7px;font-weight:700;color:#9d174d;text-align:center;">Quà đặc biệt</div>
       </div>
-      <div style="font-size:7px;color:#9d174d;text-align:center;font-weight:bold;">Tỉ lệ CỰC HIẾM ✨</div>
+      <div style="font-size:7.5px;color:#be123c;font-weight:800;text-align:center;margin-top:auto;">TỈ LỆ CỰC HIẾM ✨</div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#be185d;">SECRET (Hiếm)</div>
+  <div class="ph-lbl" style="color:#be185d;font-size:8px;">Visual SECRET</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     3 REWARD SCREENS
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-reward" style="left:1700px;top:40px;">
-  <div class="phone-screen">
-    <div class="sc">
-      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Nhánh 1</div>
-      <div class="sc-title" style="font-size:8.5px;">🎟 Ecode Omni<br>+ E-Voucher F&B</div>
-      <div class="sc-divider"></div>
-      <div class="reward-badge">✅ ≥ 4 điểm</div>
-      <div class="reward-badge" style="margin-top:2px;">📦 Tối đa 1 quà/KH</div>
-      <div style="font-size:6.5px;color:#047857;margin-top:3px;font-weight:bold;">Tất cả KH đủ điều kiện</div>
-      <div class="ui-btn green" style="margin-top:4px;font-size:6.5px;">Nhận quà →</div>
-    </div>
-  </div>
-  <div class="phone-label" style="font-size:8.5px;">Phần Thưởng Nhánh 1</div>
-</div>
 
-<div class="phone scr-reward" style="left:1700px;top:360px;">
-  <div class="phone-screen">
+<!-- ════════════════════════════════════════
+     ECODE SCREEN (MERGE)
+════════════════════════════════════════ -->
+<div class="phone s-ecode" style="left:2180px;top:344px;">
+  <div class="step-num" style="background:#059669;">✉️</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Nhánh 2</div>
-      <div class="sc-title" style="font-size:8.5px;">📋 Ecode Omni<br>+ Phiếu quà 100k</div>
-      <div class="sc-divider"></div>
-      <div class="reward-badge" style="background:#fef9c3;color:#713f12;border:1px solid #fde68a;">👤 KH MỚI (KHM)</div>
-      <div class="reward-badge" style="margin-top:2px;">✅ ≥ 4 điểm</div>
-      <div style="font-size:6.5px;color:#047857;margin-top:3px;font-weight:bold;">Chỉ áp dụng KHM</div>
-      <div class="ui-btn green" style="margin-top:4px;font-size:6.5px;">Nhận quà →</div>
-    </div>
-  </div>
-  <div class="phone-label" style="font-size:8.5px;">Phần Thưởng Nhánh 2</div>
-</div>
-
-<div class="phone scr-reward" style="left:1700px;top:680px;">
-  <div class="phone-screen">
-    <div class="sc">
-      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">Nhánh 3 ⭐</div>
-      <div class="sc-title" style="font-size:8.5px;">💍 Ecode Omni<br>+ Quà Trang Sức</div>
-      <div class="sc-divider"></div>
-      <div class="reward-badge" style="background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8;">💎 Visual SECRET</div>
-      <div class="reward-badge" style="margin-top:2px;">🛒 Phát sinh GD</div>
-      <div class="reward-badge" style="margin-top:2px;background:#fef9c3;color:#713f12;border:1px solid #fde68a;">🏆 Giới hạn 4 giải</div>
-      <div class="ui-btn" style="background:#db2777;margin-top:4px;font-size:6.5px;">Nhận quà →</div>
-    </div>
-  </div>
-  <div class="phone-label" style="font-size:8.5px;">Phần Thưởng Nhánh 3</div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════
-     ECODE SCREEN
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-conv" style="left:2000px;top:360px;">
-  <div class="phone-step-num" style="background:#059669;">✉️</div>
-  <div class="phone-screen">
-    <div class="sc">
-      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Nhận Ecode</div>
-      <div class="sc-title">Ecode Omni 🎉</div>
-      <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:8px;padding:8px;margin:3px 0;text-align:center;">
-        <div style="font-size:7.5px;font-weight:bold;color:#fff;letter-spacing:.05em;">EC-2025-XXXX</div>
-        <div style="font-size:6.5px;color:rgba(255,255,255,.8);margin-top:1px;">Mã sử dụng tại PNJ</div>
+      <div class="sc-tag" style="background:#d1fae5;color:#065f46;">Nhận Ecode Omni</div>
+      <div class="sc-title">Chúc mừng! 🎉</div>
+      <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:7px;padding:8px;text-align:center;margin:3px 0;">
+        <div style="font-size:7px;color:rgba(255,255,255,.8);">Mã ưu đãi của bạn</div>
+        <div style="font-size:8.5px;font-weight:800;color:#fff;letter-spacing:.06em;">EC-2025-XXXX</div>
+        <div style="font-size:6px;color:rgba(255,255,255,.75);">Sử dụng tại PNJ</div>
       </div>
-      <div class="sc-sub">Hệ thống ghi nhận<br>hành vi mua sắm</div>
-      <div class="ui-btn green" style="margin-top:4px;font-size:7px;">Mua ngay →</div>
+      <div class="sc-sub" style="text-align:center;font-size:6.5px;">Hệ thống ghi nhận<br>hành vi mua sắm</div>
+      <div class="ui-btn bg-em" style="margin-top:auto;font-size:7px;">Mua ngay →</div>
     </div>
   </div>
-  <div class="phone-label">Nhận Ecode Omni</div>
+  <div class="ph-lbl">Nhận Ecode Omni</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
+
+<!-- ════════════════════════════════════════
      DECISION DIAMOND
-══════════════════════════════════════════════════════ -->
-<div style="position:absolute;left:2232px;top:440px;width:176px;height:120px;display:flex;align-items:center;justify-content:center;">
-  <div style="position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;">
-    <div style="transform:rotate(45deg);width:84px;height:84px;background:#fefce8;border:2px solid #f59e0b;position:absolute;box-shadow:0 4px 16px rgba(245,158,11,.15);"></div>
-    <div style="position:relative;z-index:1;text-align:center;">
-      <div style="font-size:16px;line-height:1;">🛒</div>
-      <div style="font-size:7.5px;font-weight:bold;color:#78350f;line-height:1.2;margin-top:1px;">Đã phát<br>sinh GD?</div>
-    </div>
+════════════════════════════════════════ -->
+<div class="diamond-wrap" style="left:2330px;top:420px;width:140px;height:120px;">
+  <div class="diamond-inner"></div>
+  <div class="diamond-txt">
+    <div style="font-size:16px;line-height:1;">🛒</div>
+    <div style="font-size:7px;font-weight:800;color:#78350f;margin-top:1px;line-height:1.2;">Đã phát<br>sinh GD?</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     CONVERTED SCREEN
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-conv" style="left:2500px;top:150px;">
-  <div class="phone-step-num" style="background:#22c55e;">✅</div>
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     CONVERTED
+════════════════════════════════════════ -->
+<div class="phone s-conv" style="left:2600px;top:194px;">
+  <div class="step-num" style="background:#22c55e;">✅</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#dcfce7;color:#15803d;">Nhánh A</div>
-      <div class="sc-title">Mua hàng thành công! 🎊</div>
-      <div style="background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;padding:10px;text-align:center;margin:4px 0;">
-        <div style="font-size:22px;">🏆</div>
-        <div style="font-size:7px;font-weight:bold;color:#fff;">Converted!</div>
+      <div class="sc-tag" style="background:#dcfce7;color:#15803d;">Nhánh A — Converted</div>
+      <div class="sc-title" style="font-size:8px;">Mua thành công! 🎊</div>
+      <div style="background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:7px;padding:10px;text-align:center;margin:2px 0;">
+        <div style="font-size:20px;">🏆</div>
+        <div style="font-size:7px;font-weight:800;color:#fff;">Converted!</div>
       </div>
-      <div class="sc-sub" style="text-align:center;">Cảm ơn bạn đã<br>mua sắm tại PNJ ✨</div>
+      <div class="sc-sub" style="text-align:center;font-size:6.5px;">Cảm ơn bạn đã<br>mua sắm tại PNJ ✨</div>
     </div>
   </div>
-  <div class="phone-label" style="color:#15803d;">Converted ✓</div>
+  <div class="ph-lbl" style="color:#15803d;">Converted ✓</div>
 </div>
 
-<!-- END FLOW card -->
-<div class="card" style="left:2740px;top:225px;width:130px;border-color:#cbd5e1;background:#f8fafc;">
-  <div class="card-title" style="color:#64748b;font-size:11px;">🏁 End Flow</div>
-  <div class="card-meta" style="font-size:9.5px;">Dừng kịch bản<br>chiến dịch</div>
+<!-- End flow card -->
+<div style="position:absolute;left:2840px;top:275px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:10px 12px;width:118px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:#64748b;">🏁 End Flow</div>
+  <div style="font-size:8.5px;color:#94a3b8;margin-top:3px;line-height:1.4;">Dừng kịch bản<br>chiến dịch</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     DROP-OFF + NURTURING FLOW
-══════════════════════════════════════════════════════ -->
-<div class="phone scr-dropoff" style="left:2500px;top:500px;">
-  <div class="phone-step-num" style="background:#ef4444;">⚠️</div>
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     DROP-OFF
+════════════════════════════════════════ -->
+<div class="phone s-drop" style="left:2600px;top:494px;">
+  <div class="step-num" style="background:#ef4444;">⚠️</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#fee2e2;color:#991b1b;">Nhánh B</div>
-      <div class="sc-title">Chưa mua hàng</div>
-      <div class="sc-sub">Kích hoạt chuỗi<br>Nurturing Flow</div>
-      <div class="sc-divider"></div>
-      <div style="font-size:7px;color:#7f1d1d;font-weight:bold;line-height:1.6;">
-        ⏰ D+1 → D+3 → D+5 → D+10
+      <div class="sc-tag" style="background:#fee2e2;color:#991b1b;">Nhánh B — Drop-off</div>
+      <div class="sc-title" style="font-size:8px;">Chưa mua hàng</div>
+      <div class="sc-sub">Kích hoạt<br>Nurturing Flow tự động</div>
+      <div class="sc-hr"></div>
+      <div style="background:#fff1f2;border-radius:4px;padding:3px 5px;font-size:6.5px;color:#991b1b;font-weight:600;line-height:1.5;">
+        Stage 1 → Stage 2 → Stage 3<br>⏰ Tính từ ngày tham gia
       </div>
     </div>
   </div>
-  <div class="phone-label" style="color:#b91c1c;">Drop-off → Nurture</div>
+  <div class="ph-lbl" style="color:#b91c1c;">Drop-off → Nurture</div>
 </div>
 
-<!-- D+1 -->
-<div class="phone scr-nurture" style="left:2750px;top:500px;">
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     NURTURING: STAGE 1 — REMIND
+════════════════════════════════════════ -->
+<div class="phone s-nurt" style="left:2840px;top:494px;">
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">D+1 — Remind</div>
+      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">Stage 1 — Remind</div>
       <div class="sc-title" style="font-size:8.5px;">📩 Nhắc nhở</div>
-      <div class="msg-bubble">
-        Bạn ơi! Ecode vẫn<br>đang chờ bạn 🎁<br>
-        <span style="color:#be185d;font-weight:bold;">Dùng ngay hôm nay!</span>
+      <div style="background:rgba(255,255,255,.85);border-radius:5px;padding:4px 5px;font-size:7px;color:#1e293b;line-height:1.4;box-shadow:0 1px 4px rgba(0,0,0,.07);">
+        Bạn ơi! Ecode vẫn đang<br>chờ bạn 🎁<br>
+        <strong style="color:#be185d;">Dùng ngay nhé!</strong>
       </div>
-      <div class="sc-sub" style="margin-top:3px;">Nhắc KH đã vào nhưng<br>chưa thao tác</div>
+      <div class="sc-sub" style="margin-top:3px;font-size:6.5px;">KH đã vào, có code<br>nhưng chưa thao tác</div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#be185d;">D+1 Remind</div>
+  <div class="ph-lbl" style="color:#be185d;font-size:8px;">Stage 1<br>Remind</div>
 </div>
 
-<!-- D+3 / D+5 -->
-<div class="phone scr-nurture" style="left:3000px;top:500px;">
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     NURTURING: STAGE 2 — NURTURING
+════════════════════════════════════════ -->
+<div class="phone s-nurt" style="left:3080px;top:494px;">
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">D+3 / D+5</div>
-      <div class="sc-title" style="font-size:8.5px;">🌱 Nurturing</div>
-      <div class="msg-bubble">
-        Trang sức mới về!<br>
-        <span style="color:#9d174d;font-weight:bold;">Dành riêng cho bạn ✨</span>
+      <div class="sc-tag" style="background:#fce7f3;color:#9d174d;">Stage 2 — Nurturing</div>
+      <div class="sc-title" style="font-size:8.5px;">🌱 Nuôi dưỡng</div>
+      <div style="background:rgba(255,255,255,.85);border-radius:5px;padding:4px 5px;font-size:7px;color:#1e293b;line-height:1.4;box-shadow:0 1px 4px rgba(0,0,0,.07);">
+        Trang sức mới về! ✨<br>
+        <strong style="color:#9d174d;">Dành riêng cho bạn</strong>
       </div>
-      <div class="sc-divider" style="margin:3px 0;"></div>
-      <div style="font-size:6.5px;color:#6b21a8;font-weight:bold;line-height:1.5;">
+      <div class="sc-hr"></div>
+      <div style="font-size:6.5px;color:#6b21a8;font-weight:600;line-height:1.5;">
         📌 Customized Content<br>
         🛍 Guided Shopping
       </div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#7c3aed;">D+3 & D+5 Nurture</div>
+  <div class="ph-lbl" style="color:#7c3aed;font-size:8px;">Stage 2<br>Nurturing Content</div>
 </div>
 
-<!-- D+10 (Chuyển thành Mockup Phone đầy đủ) -->
-<div class="phone scr-final" style="left:3250px;top:500px;">
-  <div class="phone-screen">
+
+<!-- ════════════════════════════════════════
+     NURTURING: STAGE 3 — FINAL OFFER
+════════════════════════════════════════ -->
+<div class="phone s-final" style="left:3320px;top:494px;">
+  <div class="step-num" style="background:#e11d48;">🚨</div>
+  <span class="phone-notch"></span>
+  <div class="pscr">
     <div class="sc">
-      <div class="sc-tag" style="background:#ffe4e6;color:#9f1239;">D+10 — Final Offer</div>
-      <div class="sc-title" style="font-size:8.5px;">🚨 Cơ hội cuối cùng!</div>
-      
-      <div class="msg-bubble" style="background:#fff1f2;border:1px solid #fda4af;margin-top:4px;padding:6px;">
-        <div style="font-weight:bold;color:#e11d48;margin-bottom:3px;font-size:7.5px;">Ưu đãi đặc biệt ⏳</div>
-        <div style="background:linear-gradient(135deg,#f43f5e,#e11d48);border-radius:4px;padding:8px 6px;text-align:center;color:#fff;margin:3px 0;box-shadow:0 2px 6px rgba(225,29,72,.2);">
-           <div style="font-size:12px;font-weight:800;letter-spacing:1px;">GIẢM 10%</div>
-        </div>
-        <span style="font-size:6.5px;line-height:1.4;color:#9f1239;">Mã ưu đãi dành riêng KHM.<br>Sử dụng ngay hôm nay!</span>
+      <div class="sc-tag" style="background:#ffe4e6;color:#9f1239;">Stage 3 — Final Offer</div>
+      <div class="sc-title" style="font-size:8px;">🚨 Chốt chặn cuối!</div>
+      <div style="background:linear-gradient(135deg,#f43f5e,#e11d48);border-radius:6px;padding:6px;text-align:center;margin:2px 0;">
+        <div style="font-size:11px;font-weight:800;color:#fff;">GIẢM 10%</div>
+        <div style="font-size:6px;color:rgba(255,255,255,.85);">Offer code đặc biệt<br>⏳ HSD: 48h</div>
       </div>
-      
-      <div class="sc-sub" style="margin-top:auto;text-align:center;color:#9f1239;">
-        Chỉ kích hoạt nếu<br>chưa phát sinh Giao dịch
+      <div style="font-size:6.5px;color:#9f1239;line-height:1.5;font-weight:600;">
+        ✅ Chỉ KHM<br>
+        ✅ Chưa phát sinh GD<br>
+        ⏰ HSD 48h từ khi nhận tin
       </div>
     </div>
   </div>
-  <div class="phone-label" style="font-size:8.5px;color:#e11d48;">D+10 Final Offer</div>
+  <div class="ph-lbl" style="color:#e11d48;font-size:8px;">Stage 3<br>Final Offer (48h)</div>
 </div>
 
-<!-- Data CN (Node hệ thống - Không phải Phone Mockup) -->
-<div style="position:absolute;left:3520px;top:535px;background:#f8fafc;border:2px solid #cbd5e1;border-radius:10px;padding:10px;width:140px;box-shadow:0 4px 12px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:6px;">
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div style="background:#64748b;color:#fff;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;">🗄️</div>
-    <div style="font-size:10px;font-weight:bold;color:#334155;">HỆ THỐNG<br>CRM</div>
+
+<!-- ════════════════════════════════════════
+     DATA HANDOVER
+════════════════════════════════════════ -->
+<div style="position:absolute;left:3560px;top:545px;background:#fff;border:1.5px solid #94a3b8;border-radius:12px;padding:12px 14px;width:175px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:800;color:#334155;margin-bottom:5px;">📦 Data Handover</div>
+  <div style="font-size:9px;color:#475569;line-height:1.6;">
+    <strong>Data HO</strong> (Hội sở)<br>↓ Chuyển về<br>
+    <strong style="color:#1d4ed8;">Data CN</strong> (Chi nhánh)<br>
+    <br>
+    <span style="color:#334155;font-weight:600;">📞 Telesale</span><br>
+    <span style="color:#334155;font-weight:600;">👥 CSKH tiếp nhận</span>
   </div>
-  <div style="font-size:8.5px;color:#475569;line-height:1.4;">
-    Tiếp nhận Data Drop-off.<br>
-    <span style="font-weight:bold;">Hành động:</span> Telesale xử lý.
-  </div>
-</div>
-<div class="phone-label" style="font-size:8.5px;color:#475569;left:3590px;top:640px;">Đẩy Data Chi Nhánh</div>
-
-<div style="position:absolute;left:40px;top:840px;background:#fff;border:1px dashed #cbd5e1;border-radius:10px;padding:12px;width:190px;font-size:10px;line-height:1.7;box-shadow:0 2px 8px rgba(0,0,0,.04);">
-  <div style="font-weight:bold;color:#334155;margin-bottom:6px;">📖 Thuật Ngữ</div>
-  <span style="color:#1d4ed8;font-weight:bold;">KHM</span> = Khách hàng Mới<br>
-  <span style="color:#15803d;font-weight:bold;">KHC</span> = Khách hàng Cũ<br>
-  <span style="color:#78350f;font-weight:bold;">GD</span> = Giao dịch<br>
-  <span style="color:#475569;font-weight:bold;">HO</span> = Hội sở<br>
-  <span style="color:#1d4ed8;font-weight:bold;">CN</span> = Chi nhánh<br>
-  <span style="color:#6d28d9;font-weight:bold;">CDP</span> = Customer Data Platform<br>
-  <span style="color:#059669;font-weight:bold;">Ecode</span> = Electronic Code (PNJ)
+  <div style="background:#dbeafe;border-radius:5px;padding:3px 6px;font-size:8.5px;font-weight:700;color:#1d4ed8;margin-top:5px;text-align:center;">Data CN xử lý</div>
 </div>
 
-<div style="position:absolute;left:250px;top:840px;background:#fff;border:1.5px solid #fecdd3;border-radius:10px;padding:12px;width:200px;font-size:10px;line-height:1.8;box-shadow:0 2px 8px rgba(0,0,0,.05);">
-  <div style="font-weight:bold;color:#be123c;margin-bottom:4px;">⏰ Timeline Nurturing</div>
-  <div style="color:#64748b;font-style:italic;font-size:9px;margin-bottom:4px;">Tính từ ngày KH tham gia / nhận code</div>
-  <span style="color:#e11d48;font-weight:bold;">D+1</span> → Remind (nhắc nhở)<br>
-  <span style="color:#7c3aed;font-weight:bold;">D+3</span> → Nurture content<br>
-  <span style="color:#7c3aed;font-weight:bold;">D+5</span> → Nurture content<br>
-  <span style="color:#e11d48;font-weight:bold;">D+10</span> → Final offer (-10%)<br>
-  <div style="margin-top:4px;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:4px 6px;font-size:9px;color:#92400e;">
-    ⚠️ D+10 chỉ áp dụng <strong>KHM</strong> chưa phát sinh GD
+
+<!-- ════════════════════════════════════════
+     LEGEND + GLOSSARY
+════════════════════════════════════════ -->
+<div style="position:absolute;left:55px;top:840px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;width:220px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Legend</div>
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#e0e7ff;border:1.5px solid #6366f1;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Entry / Điều hướng</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#fef9c3;border:1.5px solid #f59e0b;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Định danh & Input form</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#f8fafc;border:1.5px solid #64748b;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Backend Rules (Hệ thống)</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#d1fae5;border:1.5px solid #10b981;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Gamification & Điểm</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#e0f2fe;border:1.5px solid #0ea5e9;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Rule / Nhánh Trả Thưởng</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#fce7f3;border:1.5px solid #db2777;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Rule 3 SECRET (hiếm)</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#dcfce7;border:1.5px solid #22c55e;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Converted ✓</span></div>
+    <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;border-radius:3px;background:#fee2e2;border:1.5px solid #ef4444;flex-shrink:0;"></div><span style="font-size:9.5px;color:#334155;">Nurturing Flow</span></div>
   </div>
 </div>
 
-</div><!-- #cv -->
-</div><!-- #vp -->
+<div style="position:absolute;left:295px;top:840px;background:#fff;border:1px dashed #cbd5e1;border-radius:10px;padding:11px;width:185px;font-size:9.5px;line-height:1.8;box-shadow:0 2px 6px rgba(0,0,0,.04);">
+  <div style="font-weight:700;color:#334155;margin-bottom:5px;">📖 Thuật Ngữ</div>
+  <span style="color:#1d4ed8;font-weight:600;">KHM</span> = Khách hàng Mới<br>
+  <span style="color:#15803d;font-weight:600;">KHC</span> = Khách hàng Cũ<br>
+  <span style="color:#78350f;font-weight:600;">GD</span> = Giao dịch<br>
+  <span style="color:#475569;font-weight:600;">HO/CN</span> = Hội sở / Chi nhánh<br>
+  <span style="color:#6d28d9;font-weight:600;">CDP</span> = Customer Data Platform<br>
+  <span style="color:#059669;font-weight:600;">Ecode</span> = Electronic Code<br>
+  <span style="color:#94a3b8;font-weight:600;">T.B.U</span> = To Be Updated
+</div>
 
-<div id="hint">🖱 Kéo để di chuyển &nbsp;|&nbsp; Scroll để zoom &nbsp;|&nbsp; ⌂ Reset view</div>
+<!-- Nurturing timing note -->
+<div style="position:absolute;left:2840px;top:900px;background:#fff;border:1.5px solid #fecdd3;border-radius:10px;padding:10px 12px;width:420px;font-size:9px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+  <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#be123c;margin-bottom:5px;">⏰ Nurturing Flow — Chi tiết 3 Giai Đoạn (Timing T.B.D)</div>
+  <div style="display:flex;gap:8px;">
+    <div style="flex:1;background:#fff1f2;border-radius:5px;padding:5px 7px;">
+      <div style="font-weight:700;color:#e11d48;margin-bottom:2px;">Stage 1 — Remind</div>
+      <div style="color:#334155;line-height:1.5;">Nhắc nhở KH đã vào, có code nhưng chưa mua</div>
+    </div>
+    <div style="flex:1;background:#fdf2f8;border-radius:5px;padding:5px 7px;">
+      <div style="font-weight:700;color:#9d174d;margin-bottom:2px;">Stage 2 — Nurturing</div>
+      <div style="color:#334155;line-height:1.5;">Customized content + Guided Shopping kích thích nhu cầu</div>
+    </div>
+    <div style="flex:1;background:#fff1f2;border-radius:5px;padding:5px 7px;">
+      <div style="font-weight:700;color:#e11d48;margin-bottom:2px;">Stage 3 — Final Offer</div>
+      <div style="color:#334155;line-height:1.5;">Giảm 10%, HSD <strong>48h</strong> từ khi nhận. Chỉ <strong>KHM</strong> chưa phát sinh GD</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /cv -->
+</div><!-- /vp -->
+
+<div id="hint">🖱 Kéo để di chuyển &nbsp;|&nbsp; Scroll để zoom &nbsp;|&nbsp; ⌂ Reset</div>
 
 <script>
-const vp=document.getElementById('vp');
-const cv=document.getElementById('cv');
-const zl=document.getElementById('zlbl');
-let sc=0.65,tx=40,ty=30;
-let dr=false,sx,sy,stx,sty;
+const vp=document.getElementById('vp'),cv=document.getElementById('cv'),zl=document.getElementById('zlbl');
+let sc=0.62,tx=30,ty=60,dr=false,sx,sy,stx,sty;
 
-function applyT(){
-  cv.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`;
-  zl.textContent=Math.round(sc*100)+'%';
-}
-function doZoom(f){
-  const cx=vp.clientWidth/2,cy=vp.clientHeight/2;
-  const ns=Math.max(.15,Math.min(3,sc*f));
-  tx=cx-(cx-tx)*(ns/sc); ty=cy-(cy-ty)*(ns/sc);
-  sc=ns; applyT();
-}
-function resetV(){sc=0.65;tx=40;ty=30;applyT();}
+function at(){cv.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`;zl.textContent=Math.round(sc*100)+'%';}
+function dz(f){const cx=vp.clientWidth/2,cy=vp.clientHeight/2,ns=Math.max(.12,Math.min(3,sc*f));tx=cx-(cx-tx)*(ns/sc);ty=cy-(cy-ty)*(ns/sc);sc=ns;at();}
+function rv(){sc=0.62;tx=30;ty=60;at();}
 
 vp.addEventListener('wheel',e=>{
-  e.preventDefault();
-  const f=e.deltaY<0?1.1:1/1.1;
-  const r=vp.getBoundingClientRect();
-  const mx=e.clientX-r.left,my=e.clientY-r.top;
-  const ns=Math.max(.15,Math.min(3,sc*f));
-  tx=mx-(mx-tx)*(ns/sc); ty=my-(my-ty)*(ns/sc);
-  sc=ns; applyT();
+  e.preventDefault();const f=e.deltaY<0?1.1:1/1.1;
+  const r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const ns=Math.max(.12,Math.min(3,sc*f));tx=mx-(mx-tx)*(ns/sc);ty=my-(my-ty)*(ns/sc);sc=ns;at();
 },{passive:false});
-
-vp.addEventListener('mousedown',e=>{
-  if(e.target.closest('button'))return;
-  dr=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;
-  vp.classList.add('drag');
-});
-window.addEventListener('mousemove',e=>{
-  if(!dr)return;
-  tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);applyT();
-});
+vp.addEventListener('mousedown',e=>{if(e.target.closest('button'))return;dr=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;vp.classList.add('drag');});
+window.addEventListener('mousemove',e=>{if(!dr)return;tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);at();});
 window.addEventListener('mouseup',()=>{dr=false;vp.classList.remove('drag');});
 
 let ltd=null;
-vp.addEventListener('touchstart',e=>{
-  if(e.touches.length===1){dr=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;}
-});
+vp.addEventListener('touchstart',e=>{if(e.touches.length===1){dr=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;}});
 vp.addEventListener('touchmove',e=>{
   e.preventDefault();
-  if(e.touches.length===1&&dr){tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);applyT();}
-  else if(e.touches.length===2){
-    const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-    const d=Math.sqrt(dx*dx+dy*dy);if(ltd)doZoom(d/ltd);ltd=d;
-  }
+  if(e.touches.length===1&&dr){tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);at();}
+  else if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.sqrt(dx*dx+dy*dy);if(ltd)dz(d/ltd);ltd=d;}
 },{passive:false});
 vp.addEventListener('touchend',()=>{dr=false;ltd=null;});
 
-applyT();
+at();
 </script>
 </body>
 </html>
